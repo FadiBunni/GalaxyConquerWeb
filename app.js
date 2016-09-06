@@ -1,3 +1,6 @@
+var GrayzonePlanet = require('./server/GrayzonePlanet');
+
+
 var express = require('express');
 var app = express();
 var serv = require('http').Server(app);

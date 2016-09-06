@@ -17,5 +17,10 @@
 <script>
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px arial';
+
 	var socket = io();
+
+	socket.on('spawnGrayzonePlanets',function(data){
+		ctx.arc(75,75,50,0,Math.PI*2,true);
+	})
 </script>
