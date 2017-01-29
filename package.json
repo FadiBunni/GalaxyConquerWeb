@@ -3,22 +3,15 @@
   "version": "1.0.0",
   "description": "a multiplayer game",
   "main": "app.js",
-  "dependencies": {
-    "express": "^4.13.4",
-    "socket.io": "^1.4.5"
-  },
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "watchify client/js/game.js -o client/js/bundle/bundle.js"
   },
-  "author": "",
+  "author": "Fadi Bunni",
   "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/FadiBunni/GalaxyConquerWeb.git"
-  },
-  "bugs": {
-    "url": "https://github.com/FadiBunni/GalaxyConquerWeb/issues"
-  },
-  "homepage": "https://github.com/FadiBunni/GalaxyConquerWeb#readme"
+  "dependencies": {
+    "browserify": "^13.1.0",
+    "express": "^4.14.0",
+    "nodemon": "^1.11.0",
+    "socket.io": "^1.7.2"
+  }
 }
