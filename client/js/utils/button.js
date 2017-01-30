@@ -3,7 +3,7 @@ var Button = function(canvas,ctx,GAME_SETTINGS,data) {
 	this.initialize = function(){};
 	this.setEvents  = function(){};
 	this.touchstart = function(){};
-	this.touchmove = function(){};
+	this.touchmove  = function(){};
 	this.touchend   = function(){};
 
 

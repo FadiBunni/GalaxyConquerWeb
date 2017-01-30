@@ -2,8 +2,6 @@ const img = require('./imgimport.js');
 
 var start = {
   initialize: function(canvas,ctx,GAME_SETTINGS){
-  	ctx.fillStyle = 'black';
-  	ctx.fillRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
   	img.imgImport('spaceship',ctx);
   },
 
