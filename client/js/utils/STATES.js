@@ -1,29 +1,38 @@
 const Img = require('./imgimport.js');
 const Button = require('./button.js');
 
+var INTERVAL = 10;
+var mainLoop = function(){};
+  var interval = setInterval(function(){
+    mainLoop();
+},INTERVAL);
+
+
+
 var start = {
-  misc: function(){
+  misc: function(socket){
     var self = this;
     self.button1 = new Button();
     self.button1.click = function(){
-      start.toWait();
+      start.toWait(socket);
     };
     self.button1.update = function(){
       var text = this.data.text;
       var animation = this.data.animation;
       animation .count += animation.dir;
       if(animation.count <= 0 || animation.count >= animation.maxCount){
-        animartion.dir *= -1;
+        animation.dir *= -1;
       }
       text.globalAlpha = 0.2 + 0.7*(animation.count/1000);
     }
   },
 
-  initialize: function(canvas,ctx,GAME_SETTINGS){
+  initialize: function(canvas,ctx,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
-  	this.misc();
+  	this.misc(socket);
+    //console.log(data);
     //Img.imgImport('spaceship',ctx);
-    console.log(this);
+    //console.log(this);
     start.button1.initialize(canvas,ctx,GAME_SETTINGS, {
       text:{
         x: undefined,
@@ -46,7 +55,7 @@ var start = {
         width: 230,
         height: 50,
         lineWidth: 2,
-        color: {fill:undefined, stroke:undefined},
+        color: {fill:'red', stroke:undefined},
         colorData: {
           default: {fill:"#1099cc", stroke:"#223344"},
           mouseover: {fill:"#0686e0", stroke:"#223344"}
@@ -58,16 +67,24 @@ var start = {
         dir: 1,
       }
     });
-   
+    mainLoop = start.loop;
   },
 
   loop: function(){
+    start.button1.update();
+    start.button1.draw();
   },
 
-  destory:function(){
+  destroy:function(){
+    $(canvas).off();
+    canvas.removeEventListener("touchstart", start.button1.events.touchstart);
+    canvas.removeEventListener("touchmove", start.button1.events.touchmove);
+    canvas.removeEventListener("touchend", start.button1.events.touchend);
   },
 
-  toWait: function(){
+  toWait: function(socket){
+    this.destroy();
+    socket.emit('waiting');
     console.log('heey');
   }
 };
@@ -75,19 +92,19 @@ var start = {
 var waiting = {
   initialize: function(){},
   loop: function(){},
-  destory:function(){}
+  destroy:function(){}
 };
 
 var ready = {
   initialize: function(){},
   loop: function(){},
-  destory:function(){}
+  destroy:function(){}
 };
 
 var playing = {
   initialize: function(){},
   loop: function(){},
-  destory:function(){}
+  destroy:function(){}
 };
 
 module.exports = {start,waiting,ready,playing};

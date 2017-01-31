@@ -1,19 +1,19 @@
 const Text = new (require('./text.js'));
 
 function Button(canvas,ctx,GAME_SETTINGS,data) {
+
 	this.events = {};
 
 	this.initialize = function(canvas, ctx, GAME_SETTINGS, data){
     //Text.initialize.call(this, canvas, ctx, GAME_SETTINGS, data);
-
     Text.initialize.call(this,canvas, ctx, GAME_SETTINGS, data);
-
-    var rect = data.rect;
-    var text = data.text;
+    var rect = this.data.rect;
+    var text = this.data.text;
     rect.x = rect.x?rect.x:GAME_SETTINGS.WIDTH/2;
     rect.y = rect.y?rect.y:GAME_SETTINGS.HIGHT/2;
     rect.color=rect.colorData.default
     if(this.setEvents){
+      console.log('setEvents is set');
       this.setEvents(canvas);
     }
   };
@@ -21,11 +21,12 @@ function Button(canvas,ctx,GAME_SETTINGS,data) {
 	this.setEvents = function(canvas){
     //This is declared as a n global obtject, try to add 'var' later. 
     buttonObject = this;
-
     $(canvas).on('click', function(e){
       if(buttonObject.data){
+        //console.log('clicked');
         var rect = buttonObject.data.rect;
         if(pointSquareCollisionCheck(e.offsetX, e.offsetY, rect)){
+          console.log('clicked');
           buttonObject.click();
         }
       }
@@ -43,6 +44,7 @@ function Button(canvas,ctx,GAME_SETTINGS,data) {
 	this.events.touchstart = function(e){
     e.preventDefault();
     buttonObject.mousemove(e);
+
   };
 
 	this.events.touchmove  = function(e){
@@ -70,19 +72,26 @@ function Button(canvas,ctx,GAME_SETTINGS,data) {
       }
       var rect = this.data.rect;
       var text = this.data.text;
-      var mouseover = pointSquareCollusionCheck(x, y, rect);
+      var mouseover = pointSquareCollisionCheck(x, y, rect);
 
       rect.color = mouseover?rect.colorData.mouseover:rect.colorData.default;
       text.color = mouseover?text.colorData.mouseover:text.colorData.default;
     }
+  };
+
+  this.draw = function() {
+    if(!this.data) return;
+      drawRect(this.ctx, this.data.rect);
+      Text.draw.call(this);
   };
 }
 
 module.exports = Button;
 
 function pointSquareCollisionCheck(x,y,square){
-  if(x >= square.x-square.width/2 && x <= square.x+square.width/2 && y >= square.y-square.height/2 && y <= square.y+square.height/2 )
+  if(x >= square.x-square.width/2 && x <= square.x+square.width/2 && y >= square.y-square.height/2 && y <= square.y+square.height/2 ){
     return true;
+  }
 }
 
 function drawRect(ctx, rect){

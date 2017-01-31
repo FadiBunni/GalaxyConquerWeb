@@ -1,11 +1,15 @@
 function Text(){
 	this.initialize = function(canvas,ctx,GAME_SETTINGS,data){
+		this.canvas = canvas;
+		this.ctx = ctx;
+		this.GAME_SETTINGS = GAME_SETTINGS;
+		this.data = data;
+
 		var text = data.text;
 		var animation = data.animation;
 		text.x = text.x?text.x:GAME_SETTINGS.WIDTH/2;
 		text.y = text.y?text.y:GAME_SETTINGS.HEIGHT/2;
 		text.color = text.colorData.default;
-		console.log(data);
 	};
 
 	this.update = function(){
@@ -13,8 +17,8 @@ function Text(){
 	};
 
 	this.draw = function() {
-		if(!data) return;
-		drawText(ctx, data.text);
+		if(!this.data) return;
+		drawText(this.ctx, this.data.text);
 	};
 }
 

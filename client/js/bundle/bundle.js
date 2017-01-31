@@ -11,36 +11,45 @@ var ctx = canvas.getContext('2d');
 socket.on('connected', function(SERVER_GAME_SETTINGS){
 	GAME_SETTINGS = SERVER_GAME_SETTINGS;
 	const canvas = cUtils.generateCanvas(GAME_SETTINGS.WIDTH, GAME_SETTINGS.HEIGHT);
-	STATES.start.initialize(canvas,ctx,GAME_SETTINGS);
+	STATES.start.initialize(canvas,ctx,socket,GAME_SETTINGS);
 	//STATES.start.misc();
 });
 },{"./utils/STATES.js":2,"./utils/canvas.js":4}],2:[function(require,module,exports){
 const Img = require('./imgimport.js');
 const Button = require('./button.js');
 
+var INTERVAL = 10;
+var mainLoop = function(){};
+  var interval = setInterval(function(){
+    mainLoop();
+},INTERVAL);
+
+
+
 var start = {
-  misc: function(){
+  misc: function(socket){
     var self = this;
     self.button1 = new Button();
     self.button1.click = function(){
-      start.toWait();
+      start.toWait(socket);
     };
     self.button1.update = function(){
       var text = this.data.text;
       var animation = this.data.animation;
       animation .count += animation.dir;
       if(animation.count <= 0 || animation.count >= animation.maxCount){
-        animartion.dir *= -1;
+        animation.dir *= -1;
       }
       text.globalAlpha = 0.2 + 0.7*(animation.count/1000);
     }
   },
 
-  initialize: function(canvas,ctx,GAME_SETTINGS){
+  initialize: function(canvas,ctx,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
-  	this.misc();
+  	this.misc(socket);
+    //console.log(data);
     //Img.imgImport('spaceship',ctx);
-    console.log(this);
+    //console.log(this);
     start.button1.initialize(canvas,ctx,GAME_SETTINGS, {
       text:{
         x: undefined,
@@ -63,7 +72,7 @@ var start = {
         width: 230,
         height: 50,
         lineWidth: 2,
-        color: {fill:undefined, stroke:undefined},
+        color: {fill:'red', stroke:undefined},
         colorData: {
           default: {fill:"#1099cc", stroke:"#223344"},
           mouseover: {fill:"#0686e0", stroke:"#223344"}
@@ -75,16 +84,24 @@ var start = {
         dir: 1,
       }
     });
-   
+    mainLoop = start.loop;
   },
 
   loop: function(){
+    start.button1.update();
+    start.button1.draw();
   },
 
-  destory:function(){
+  destroy:function(){
+    $(canvas).off();
+    canvas.removeEventListener("touchstart", start.button1.events.touchstart);
+    canvas.removeEventListener("touchmove", start.button1.events.touchmove);
+    canvas.removeEventListener("touchend", start.button1.events.touchend);
   },
 
-  toWait: function(){
+  toWait: function(socket){
+    this.destroy();
+    socket.emit('waiting');
     console.log('heey');
   }
 };
@@ -92,19 +109,19 @@ var start = {
 var waiting = {
   initialize: function(){},
   loop: function(){},
-  destory:function(){}
+  destroy:function(){}
 };
 
 var ready = {
   initialize: function(){},
   loop: function(){},
-  destory:function(){}
+  destroy:function(){}
 };
 
 var playing = {
   initialize: function(){},
   loop: function(){},
-  destory:function(){}
+  destroy:function(){}
 };
 
 module.exports = {start,waiting,ready,playing};
@@ -112,19 +129,19 @@ module.exports = {start,waiting,ready,playing};
 const Text = new (require('./text.js'));
 
 function Button(canvas,ctx,GAME_SETTINGS,data) {
+
 	this.events = {};
 
 	this.initialize = function(canvas, ctx, GAME_SETTINGS, data){
     //Text.initialize.call(this, canvas, ctx, GAME_SETTINGS, data);
-
     Text.initialize.call(this,canvas, ctx, GAME_SETTINGS, data);
-
-    var rect = data.rect;
-    var text = data.text;
+    var rect = this.data.rect;
+    var text = this.data.text;
     rect.x = rect.x?rect.x:GAME_SETTINGS.WIDTH/2;
     rect.y = rect.y?rect.y:GAME_SETTINGS.HIGHT/2;
     rect.color=rect.colorData.default
     if(this.setEvents){
+      console.log('setEvents is set');
       this.setEvents(canvas);
     }
   };
@@ -132,11 +149,12 @@ function Button(canvas,ctx,GAME_SETTINGS,data) {
 	this.setEvents = function(canvas){
     //This is declared as a n global obtject, try to add 'var' later. 
     buttonObject = this;
-
     $(canvas).on('click', function(e){
       if(buttonObject.data){
+        //console.log('clicked');
         var rect = buttonObject.data.rect;
         if(pointSquareCollisionCheck(e.offsetX, e.offsetY, rect)){
+          console.log('clicked');
           buttonObject.click();
         }
       }
@@ -154,6 +172,7 @@ function Button(canvas,ctx,GAME_SETTINGS,data) {
 	this.events.touchstart = function(e){
     e.preventDefault();
     buttonObject.mousemove(e);
+
   };
 
 	this.events.touchmove  = function(e){
@@ -181,19 +200,26 @@ function Button(canvas,ctx,GAME_SETTINGS,data) {
       }
       var rect = this.data.rect;
       var text = this.data.text;
-      var mouseover = pointSquareCollusionCheck(x, y, rect);
+      var mouseover = pointSquareCollisionCheck(x, y, rect);
 
       rect.color = mouseover?rect.colorData.mouseover:rect.colorData.default;
       text.color = mouseover?text.colorData.mouseover:text.colorData.default;
     }
+  };
+
+  this.draw = function() {
+    if(!this.data) return;
+      drawRect(this.ctx, this.data.rect);
+      Text.draw.call(this);
   };
 }
 
 module.exports = Button;
 
 function pointSquareCollisionCheck(x,y,square){
-  if(x >= square.x-square.width/2 && x <= square.x+square.width/2 && y >= square.y-square.height/2 && y <= square.y+square.height/2 )
+  if(x >= square.x-square.width/2 && x <= square.x+square.width/2 && y >= square.y-square.height/2 && y <= square.y+square.height/2 ){
     return true;
+  }
 }
 
 function drawRect(ctx, rect){
@@ -276,12 +302,16 @@ module.exports = {
 },{}],6:[function(require,module,exports){
 function Text(){
 	this.initialize = function(canvas,ctx,GAME_SETTINGS,data){
+		this.canvas = canvas;
+		this.ctx = ctx;
+		this.GAME_SETTINGS = GAME_SETTINGS;
+		this.data = data;
+
 		var text = data.text;
 		var animation = data.animation;
 		text.x = text.x?text.x:GAME_SETTINGS.WIDTH/2;
 		text.y = text.y?text.y:GAME_SETTINGS.HEIGHT/2;
 		text.color = text.colorData.default;
-		console.log(data);
 	};
 
 	this.update = function(){
@@ -289,8 +319,8 @@ function Text(){
 	};
 
 	this.draw = function() {
-		if(!data) return;
-		drawText(ctx, data.text);
+		if(!this.data) return;
+		drawText(this.ctx, this.data.text);
 	};
 }
 
