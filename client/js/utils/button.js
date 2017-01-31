@@ -9,11 +9,10 @@ function Button(canvas,ctx,GAME_SETTINGS,data) {
     Text.initialize.call(this,canvas, ctx, GAME_SETTINGS, data);
     var rect = this.data.rect;
     var text = this.data.text;
-    rect.x = rect.x?rect.x:GAME_SETTINGS.WIDTH/2;
-    rect.y = rect.y?rect.y:GAME_SETTINGS.HIGHT/2;
+    rect.x = rect.x?rect.x:text.x?text.x:GAME_SETTINGS.WIDTH/2;
+    rect.y = rect.y?rect.y:text.y?text.y:GAME_SETTINGS.HEIGHT/2;
     rect.color=rect.colorData.default
     if(this.setEvents){
-      console.log('setEvents is set');
       this.setEvents(canvas);
     }
   };
@@ -26,7 +25,6 @@ function Button(canvas,ctx,GAME_SETTINGS,data) {
         //console.log('clicked');
         var rect = buttonObject.data.rect;
         if(pointSquareCollisionCheck(e.offsetX, e.offsetY, rect)){
-          console.log('clicked');
           buttonObject.click();
         }
       }

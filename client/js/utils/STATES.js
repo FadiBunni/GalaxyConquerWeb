@@ -1,5 +1,6 @@
-const Img = require('./imgimport.js');
+const Img    = require('./imgimport.js');
 const Button = require('./button.js');
+const Text   = require('./text.js');
 
 var INTERVAL = 10;
 var mainLoop = function(){};
@@ -10,11 +11,11 @@ var mainLoop = function(){};
 
 
 var start = {
-  misc: function(socket){
+  misc: function(canvas,ctx,socket,GAME_SETTINGS){
     var self = this;
     self.button1 = new Button();
     self.button1.click = function(){
-      start.toWait(socket);
+      start.toWait(canvas,ctx,socket,GAME_SETTINGS);
     };
     self.button1.update = function(){
       var text = this.data.text;
@@ -29,10 +30,8 @@ var start = {
 
   initialize: function(canvas,ctx,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
-  	this.misc(socket);
-    //console.log(data);
-    //Img.imgImport('spaceship',ctx);
-    //console.log(this);
+  	this.misc(canvas,ctx,socket,GAME_SETTINGS);
+    Img.imgImport('spaceship',ctx);
     start.button1.initialize(canvas,ctx,GAME_SETTINGS, {
       text:{
         x: undefined,
@@ -45,8 +44,8 @@ var start = {
         message: "START GAME",
         color: {fill:undefined, stroke:undefined},
         colorData: {
-          default: {fill:"#123456", stroke:undefined},
-          mouseover: {fill:"#ddeeff", stroke:undefined}
+          default: {fill:"#FF0000", stroke:"#FF0000"},
+          mouseover: {fill:"#FF0000", stroke: "#FF0000"}
         }
       },
       rect: {
@@ -55,10 +54,10 @@ var start = {
         width: 230,
         height: 50,
         lineWidth: 2,
-        color: {fill:'red', stroke:undefined},
+        color: {fill:undefined, stroke:undefined},
         colorData: {
-          default: {fill:"#1099cc", stroke:"#223344"},
-          mouseover: {fill:"#0686e0", stroke:"#223344"}
+          default: {fill:"#66CDAA", stroke:"#000080"},
+          mouseover: {fill:"#FFFFFF", stroke:"#FF0000"}
         }
       },
       animation: {
@@ -82,17 +81,65 @@ var start = {
     canvas.removeEventListener("touchend", start.button1.events.touchend);
   },
 
-  toWait: function(socket){
+  toWait: function(canvas,ctx,socket,GAME_SETTINGS){
     this.destroy();
     socket.emit('waiting');
-    console.log('heey');
+    ctx.restore();
+    waiting.initialize(canvas,ctx,socket,GAME_SETTINGS);
   }
 };
 
 var waiting = {
-  initialize: function(){},
-  loop: function(){},
-  destroy:function(){}
+  misc: function(){
+    var self = this;
+    self.text1 = new Text();
+    self.text1.update = function(){
+      var text = this.data.text;
+      var animation = this.data.animation;
+      animation .count += animation.dir;
+      if(animation.count <= 0 || animation.count >= animation.maxCount){
+        animation.dir *= -1;
+      }
+      text.globalAlpha = 0.2 + 0.7*(animation.count/1000);
+    }
+  },
+
+  initialize: function(canvas,ctx,socket,GAME_SETTINGS){
+
+    this.misc();
+    waiting.text1.initialize(canvas,ctx,GAME_SETTINGS, {
+      text:{
+        x: undefined,
+        y: undefined,
+        size: 30,
+        font: "Arial",
+        textBaseline: "middle",
+        textAlign: "center",
+        lineWidth: 2,
+        message: "WAITING FOR OPPONENT..",
+        globalAlpha: undefined,
+        color: {fill: undefined, stroke: undefined},
+        colorData: {
+          default: {fill: "#FFFFFF", stroke: undefined}
+        }
+      },
+      animation: {
+        maxCount: 100,
+        count: 0,
+        dir: 1,
+      }
+    });
+    mainLoop = waiting.loop;
+  },
+
+  loop: function(){
+    waiting.text1.update();
+    waiting.text1.draw();
+  },
+
+  destroy:function(){
+
+  }
 };
 
 var ready = {
@@ -108,3 +155,11 @@ var playing = {
 };
 
 module.exports = {start,waiting,ready,playing};
+
+function drawBackground(ctx,globalAlpha,color){
+    ctx.save();
+    ctx.globalAlpha = globalAlpha!==undefined?globalAlpha:1;
+    ctx.fillStyle = color?color:GAME_SETTINGS.BACKGROUND_COLOR;
+    ctx.fillRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+    ctx.restore();
+}
