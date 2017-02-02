@@ -5,15 +5,11 @@ function Text(){
 		this.GAME_SETTINGS = GAME_SETTINGS;
 		this.data = data;
 
-		var text = data.text;
+		var text = this.data.text;
 		var animation = data.animation;
 		text.x = text.x?text.x:GAME_SETTINGS.WIDTH/2;
 		text.y = text.y?text.y:GAME_SETTINGS.HEIGHT/2;
 		text.color = text.colorData.default;
-	};
-
-	this.update = function(){
-
 	};
 
 	this.draw = function() {

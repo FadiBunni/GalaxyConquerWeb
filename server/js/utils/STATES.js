@@ -4,7 +4,7 @@ const SETTINGS = require('./SETTINGS.js');
 var ready = {
 	initialize: function(io,room){
 		this.io = io;
-		room.status = "ready";
+		//room.status = "ready";
 		//Set the loop in the room "class" equal to the loop in ready object
 		room.loop = this.loop;
 		//Add countdown to the room.object array and instantiate a new one

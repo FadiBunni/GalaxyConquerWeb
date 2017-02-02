@@ -31,8 +31,26 @@ io.on('connection', function(socket){
     //Push socket to lobby and delete them form lobby when they are ready
     socket.on('waiting', function(){
         console.log('waiting from ' + socket.id);
+        //add the sockets to an array.
         lobbyManager.push(socket);
+        //Create a new room for the two sockets, and delte them from the array.
+        //see the push and dispatch function for more info.
         lobbyManager.dispatch(roomManager);
     });
+
+    socket.on('disconnect', function(){
+        var roomIndex = roomManager.roomIndex[socket.id];
+        if(roomIndex) roomManager.destroy(roomIndex);
+        lobbyManager.kick(socket);
+        console.log('user disconnected: ', socket.id);
+        io.emit('total user count updated', socket.server.eio.clientsCount);
+    });
+
+    // socket.on('ready', function(){
+    //     var roomIndex = roomManager.roomIndex[socket.id];
+    //     if(roomIndex) roomManager.rooms[roomIndex].objects[socket.id].ready = true;
+    // });
+
+
 });
 
