@@ -1,6 +1,8 @@
+const Drawobjects = require('../entities/drawObjects.js');
 const Img    = require('./imgimport.js');
 const Button = require('./button.js');
 const Text   = require('./text.js');
+
 
 var INTERVAL = 10;
 var mainLoop = function(){};
@@ -31,7 +33,7 @@ var start = {
   initialize: function(canvas,ctx,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
   	this.misc(canvas,ctx,socket,GAME_SETTINGS);
-    Img.imgImport('spaceship',ctx);
+    Img('spaceship',ctx);
     start.button1.initialize(canvas,ctx,GAME_SETTINGS, {
       text:{
         x: undefined,
@@ -106,7 +108,7 @@ var waiting = {
 
   initialize: function(canvas,ctx,socket,GAME_SETTINGS){
     this.misc();
-    Img.imgImport('spaceship',ctx);
+    Img('spaceship',ctx);
     waiting.text1.initialize(canvas,ctx,GAME_SETTINGS,{
       text:{
         x: undefined,
@@ -148,7 +150,7 @@ var ready = {
     self.button1.click = function(){
       socket.emit('ready');
       ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-      Img.imgImport('spaceship',ctx);
+      Img('spaceship',ctx);
       ready.text1.data.text.message = "waiting for opponent to be ready";
       delete ready.button1.data;
       ready.destroy();
@@ -163,11 +165,42 @@ var ready = {
       text.globalAlpha = 0.5 + 0.5*(animation.count/1000);
     };
   },
-  initialize: function(canvas,ctx,socket,GAME_SETTINGS){
+  initialize: function(canvas,ctx,socket,GAME_SETTINGS,serverObjects){
     this.misc(socket,ctx,GAME_SETTINGS);
     ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-    Img.imgImport('spaceship',ctx);
 
+    //console.log(serverObjects);
+    //console.log(serverObjects.forEach(Drawobjects));
+    for(object in serverObjects){
+      obj = serverObjects[object];
+      Drawobjects(ctx,obj);
+    }
+
+
+    //Img('spaceship',ctx);
+     // var img = new Image();
+     // img.src = 'client/img/spaceship.jpg';
+     //  ctx.drawImage(img,0,0);
+
+
+      ctx.beginPath();
+      ctx.fillStyle = "#808080";
+      ctx.arc(790,794,100,0,2*Math.PI);
+      ctx.stroke();
+      ctx.fill();
+
+
+      ctx.beginPath();
+      ctx.fillStyle = "#808080";
+      ctx.arc(200,794,100,0,2*Math.PI);
+      ctx.stroke();
+      ctx.fill();
+      ctx.restore();
+
+
+
+
+    //serverObjects.forEach(Drawobjects, 1);
     ready.text1.initialize(canvas,ctx,GAME_SETTINGS,{
       text:{
         x: GAME_SETTINGS.WIDTH/2,

@@ -7,6 +7,8 @@ const socket = io();
 
 var ctx = canvas.getContext('2d');
 
+var serverObjects=[];
+
 socket.on('connected', function(SERVER_GAME_SETTINGS){
 	GAME_SETTINGS = SERVER_GAME_SETTINGS;
 	const canvas = cUtils.generateCanvas(GAME_SETTINGS.WIDTH, GAME_SETTINGS.HEIGHT);
@@ -25,12 +27,16 @@ window.document.title = GAME_SETTINGS.TITLE+" ("+count+")";
 
 //position is not necissary yet, but might be.
 socket.on('ready', function(position){
-	STATES.ready.initialize(canvas,ctx,socket,GAME_SETTINGS);
+	STATES.ready.initialize(canvas,ctx,socket,GAME_SETTINGS,serverObjects);
 });
 
 socket.on('playing', function(){
 	STATES.ready.destroy();
 	STATES.playing.initialize();
+});
+
+socket.on('update', function(statuses){
+	serverObjects = statuses;
 });
 
 socket.on('destroy', function(message){

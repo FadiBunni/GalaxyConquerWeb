@@ -1,4 +1,21 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+function drawObjects(ctx,status){
+	switch(status.shape){
+	  case "circle":
+	  	var status = status.cic;
+	  	console.log(status);
+	    ctx.fillStyle = status.color;
+	    ctx.beginPath();
+	    ctx.arc(status.x,status.y,status.planetSize,0,2*Math.PI);
+	    ctx.stroke();
+	    ctx.fill();
+	    break;
+	}
+}
+
+module.exports = drawObjects;
+
+},{}],2:[function(require,module,exports){
 const cUtils = require('./utils/canvas.js');
 const STATES = require('./utils/STATES.js');
 var GAME_SETTINGS = null;
@@ -7,6 +24,8 @@ var Interval = 10;
 const socket = io();
 
 var ctx = canvas.getContext('2d');
+
+var serverObjects=[];
 
 socket.on('connected', function(SERVER_GAME_SETTINGS){
 	GAME_SETTINGS = SERVER_GAME_SETTINGS;
@@ -26,7 +45,7 @@ window.document.title = GAME_SETTINGS.TITLE+" ("+count+")";
 
 //position is not necissary yet, but might be.
 socket.on('ready', function(position){
-	STATES.ready.initialize(canvas,ctx,socket,GAME_SETTINGS);
+	STATES.ready.initialize(canvas,ctx,socket,GAME_SETTINGS,serverObjects);
 });
 
 socket.on('playing', function(){
@@ -34,15 +53,21 @@ socket.on('playing', function(){
 	STATES.playing.initialize();
 });
 
+socket.on('update', function(statuses){
+	serverObjects = statuses;
+});
+
 socket.on('destroy', function(message){
 	STATES.ready.destroy();
 	STATES.playing.destroy();
 	//STATES.backToTitle.initialize(message);
 });
-},{"./utils/STATES.js":2,"./utils/canvas.js":4}],2:[function(require,module,exports){
+},{"./utils/STATES.js":3,"./utils/canvas.js":5}],3:[function(require,module,exports){
+const Drawobjects = require('../entities/drawObjects.js');
 const Img    = require('./imgimport.js');
 const Button = require('./button.js');
 const Text   = require('./text.js');
+
 
 var INTERVAL = 10;
 var mainLoop = function(){};
@@ -73,7 +98,7 @@ var start = {
   initialize: function(canvas,ctx,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
   	this.misc(canvas,ctx,socket,GAME_SETTINGS);
-    Img.imgImport('spaceship',ctx);
+    Img('spaceship',ctx);
     start.button1.initialize(canvas,ctx,GAME_SETTINGS, {
       text:{
         x: undefined,
@@ -148,7 +173,7 @@ var waiting = {
 
   initialize: function(canvas,ctx,socket,GAME_SETTINGS){
     this.misc();
-    Img.imgImport('spaceship',ctx);
+    Img('spaceship',ctx);
     waiting.text1.initialize(canvas,ctx,GAME_SETTINGS,{
       text:{
         x: undefined,
@@ -190,7 +215,7 @@ var ready = {
     self.button1.click = function(){
       socket.emit('ready');
       ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-      Img.imgImport('spaceship',ctx);
+      Img('spaceship',ctx);
       ready.text1.data.text.message = "waiting for opponent to be ready";
       delete ready.button1.data;
       ready.destroy();
@@ -205,11 +230,42 @@ var ready = {
       text.globalAlpha = 0.5 + 0.5*(animation.count/1000);
     };
   },
-  initialize: function(canvas,ctx,socket,GAME_SETTINGS){
+  initialize: function(canvas,ctx,socket,GAME_SETTINGS,serverObjects){
     this.misc(socket,ctx,GAME_SETTINGS);
     ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-    Img.imgImport('spaceship',ctx);
 
+    //console.log(serverObjects);
+    //console.log(serverObjects.forEach(Drawobjects));
+    for(object in serverObjects){
+      obj = serverObjects[object];
+      Drawobjects(ctx,obj);
+    }
+
+
+    //Img('spaceship',ctx);
+     // var img = new Image();
+     // img.src = 'client/img/spaceship.jpg';
+     //  ctx.drawImage(img,0,0);
+
+
+      ctx.beginPath();
+      ctx.fillStyle = "#808080";
+      ctx.arc(790,794,100,0,2*Math.PI);
+      ctx.stroke();
+      ctx.fill();
+
+
+      ctx.beginPath();
+      ctx.fillStyle = "#808080";
+      ctx.arc(200,794,100,0,2*Math.PI);
+      ctx.stroke();
+      ctx.fill();
+      ctx.restore();
+
+
+
+
+    //serverObjects.forEach(Drawobjects, 1);
     ready.text1.initialize(canvas,ctx,GAME_SETTINGS,{
       text:{
         x: GAME_SETTINGS.WIDTH/2,
@@ -295,7 +351,7 @@ function drawBackground(ctx,globalAlpha,color){
     ctx.fillRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
     ctx.restore();
 }
-},{"./button.js":3,"./imgimport.js":5,"./text.js":6}],3:[function(require,module,exports){
+},{"../entities/drawObjects.js":1,"./button.js":4,"./imgimport.js":6,"./text.js":7}],4:[function(require,module,exports){
 const Text = new (require('./text.js'));
 
 function Button(canvas,ctx,GAME_SETTINGS,data) {
@@ -408,7 +464,7 @@ function drawRect(ctx, rect){
   }
   ctx.restore();
 }
-},{"./text.js":6}],4:[function(require,module,exports){
+},{"./text.js":7}],5:[function(require,module,exports){
 var Canvas = {
 	getPixelRatio : function getPixelRatio(ctx) {
 	  console.log('Determining pixel ratio.');
@@ -456,17 +512,18 @@ var Canvas = {
 };
 
 module.exports = Canvas;
-},{}],5:[function(require,module,exports){
-module.exports = {
-	imgImport: function(imgName,ctx){
-		var img = new Image();
-		img.src = 'client/img/' + imgName + '.jpg';
-		img.onload = function(){
-			ctx.drawImage(img,0,0);
-		}
-	}
-};
 },{}],6:[function(require,module,exports){
+function imgImport(imgName,ctx){
+	var img = new Image();
+	img.onload = function(){
+		ctx.drawImage(img,0,0);
+	};
+	img.src = 'client/img/' + imgName + '.jpg';
+}
+
+module.exports = imgImport;
+
+},{}],7:[function(require,module,exports){
 function Text(){
 	this.initialize = function(canvas,ctx,GAME_SETTINGS,data){
 		this.canvas = canvas;
@@ -509,4 +566,4 @@ function drawText(ctx, text){
   }
   ctx.restore();
 }
-},{}]},{},[1]);
+},{}]},{},[2]);

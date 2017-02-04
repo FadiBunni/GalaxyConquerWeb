@@ -4,9 +4,11 @@ const SETTINGS = require('./SETTINGS.js');
 var ready = {
 	initialize: function(io,room){
 		this.io = io;
-		//room.status = "ready";
+		room.status = "ready";
 		//Set the loop in the room "class" equal to the loop in ready object
 		room.loop = this.loop;
+		var statuses = getAllStatsFromPlanets(room);
+		io.to(room.id).emit('update', statuses);
 		//Add countdown to the room.object array and instantiate a new one
 		//room.objects.countdown = new Countdown(10,null,SETTINGS.HEIGHT-40);
     	//room.objects.countdown.action = function(room){
@@ -25,7 +27,7 @@ var ready = {
 		// 	playing.initialize(ready.io,room);
 		// }
 		//get statuses from all the objects in the room array, and send it to client
-		var statuses = getStatsFromObejcts(room);
+		var statuses = getPlanetScoreNumberFromPlanets(room);
 		ready.io.to(room.id).emit('update', statuses);
 		/*You can return the data, so it can be consoled.log in room class
 		within the room.runLoop method.*/
@@ -51,7 +53,7 @@ var playing = {
 
 	loop: function(room){
 		//get statuses from all the objects in the room array, and send it to client
-		var statuses = getStatsFromObejcts(room);
+		var statuses = getAllStatsFromPlanets(room);
 		playing.io.to(room.id).emit('update', statuses);
 		// if(room.status == "playing" && (room.objects[room.players[0].id].score>=SETTINGS.GOAL || room.objects[room.players[1].id].score>=SETTINGS.GOAL)){
 		// 	room.status = "gameOver";
@@ -69,18 +71,37 @@ var playing = {
 };
 module.exports = {ready,playing};
 
-function getStatsFromObejcts(room){
+//the problem with this function is that is sends all the same data again, even though the grayzoneplanets does not move.
+function getAllStatsFromPlanets(room){
 	var statuses = [];
 	//Object is all the objects in the object array in room "class".
 	for(var object in room.objects){
 		//console.log("object: " + object);
-		//Get the specifik class/entity.
+		//Get the specific class/entity.
 		var obj = room.objects[object];
-		//console.log("obj: " + obj);
-		//Update all the classes with an update method and push all statuses in every object.
-		obj.update(room);
+		//console.log("obj: " + obj.status);
 		statuses.push(obj.status);
-		//console.log("obj.status: " + obj.status);
+		//console.log("obj.status: " + obj);
 	}
+	console.log(statuses);
 	return statuses;
 }
+
+function getPlanetScoreNumberFromPlanets(room){
+	var statuses = [];
+	//Object is all the objects in the object array in room "class".
+	for(var object in room.objects){
+		//console.log("object: " + object);
+		//Get the specific class/entity.
+		var obj = room.objects[object];
+		//console.log("obj: " + obj.status);
+		//Update all the classes with an update method and push all statuses in every object.
+		obj.update(room);
+		statuses.push(obj.status.cic.planetScoreNumber);
+		//console.log("obj.status: " + obj);
+	}
+	console.log(statuses);
+	return statuses;
+}
+
+function getAllStatsFromShips(room){}

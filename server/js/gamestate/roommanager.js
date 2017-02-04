@@ -23,7 +23,7 @@ function RoomManager(io){
 		RmMg.roomIndex[player0.id] = roomId;
 		RmMg.roomIndex[player1.id] = roomId;
 
-		STATES.ready.initialize(io,room);
+		STATES.ready.initialize(io, room);
 		// //Emit to players that they are ready, and their side on the map
 		io.to(player0.id).emit('ready', 'left');
 		io.to(player1.id).emit('ready', 'right');
