@@ -83,7 +83,7 @@ function getAllStatsFromPlanets(room){
 		statuses.push(obj.status);
 		//console.log("obj.status: " + obj);
 	}
-	console.log(statuses);
+	//console.log(statuses);
 	return statuses;
 }
 
@@ -100,7 +100,7 @@ function getPlanetScoreNumberFromPlanets(room){
 		statuses.push(obj.status.cic.planetScoreNumber);
 		//console.log("obj.status: " + obj);
 	}
-	console.log(statuses);
+	//console.log(statuses);
 	return statuses;
 }
 

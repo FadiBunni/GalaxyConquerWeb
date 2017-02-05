@@ -1,6 +1,6 @@
 const SETTINGS = {
   TITLE : "Galaxy Conquer",
-  WIDTH : 1200,
+  WIDTH : 1280,
   HEIGHT : 800,
   BORDER_WIDTH : 10,
   BACKGROUND_COLOR : "#FFFFFF"

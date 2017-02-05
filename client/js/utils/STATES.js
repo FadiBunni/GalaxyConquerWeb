@@ -10,8 +10,6 @@ var mainLoop = function(){};
     mainLoop();
 },INTERVAL);
 
-
-
 var start = {
   misc: function(canvas,ctx,socket,GAME_SETTINGS){
     var self = this;
@@ -143,14 +141,16 @@ var waiting = {
 };
 
 var ready = {
-  misc: function(socket,ctx,GAME_SETTINGS){
+  misc: function(socket,ctx,GAME_SETTINGS,serverObjects){
     var self = this;
     self.text1 = new Text();
     self.button1 = new Button();
     self.button1.click = function(){
       socket.emit('ready');
       ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-      Img('spaceship',ctx);
+      Img('spaceship',ctx,function(){
+       drawGrayzonePlanets(ctx,serverObjects);
+      });
       ready.text1.data.text.message = "waiting for opponent to be ready";
       delete ready.button1.data;
       ready.destroy();
@@ -166,41 +166,13 @@ var ready = {
     };
   },
   initialize: function(canvas,ctx,socket,GAME_SETTINGS,serverObjects){
-    this.misc(socket,ctx,GAME_SETTINGS);
+    this.misc(socket,ctx,GAME_SETTINGS,serverObjects);
     ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
 
-    //console.log(serverObjects);
-    //console.log(serverObjects.forEach(Drawobjects));
-    for(object in serverObjects){
-      obj = serverObjects[object];
-      Drawobjects(ctx,obj);
-    }
+    Img('spaceship',ctx,function(){
+      drawGrayzonePlanets(ctx,serverObjects);
+    });
 
-
-    //Img('spaceship',ctx);
-     // var img = new Image();
-     // img.src = 'client/img/spaceship.jpg';
-     //  ctx.drawImage(img,0,0);
-
-
-      ctx.beginPath();
-      ctx.fillStyle = "#808080";
-      ctx.arc(790,794,100,0,2*Math.PI);
-      ctx.stroke();
-      ctx.fill();
-
-
-      ctx.beginPath();
-      ctx.fillStyle = "#808080";
-      ctx.arc(200,794,100,0,2*Math.PI);
-      ctx.stroke();
-      ctx.fill();
-      ctx.restore();
-
-
-
-
-    //serverObjects.forEach(Drawobjects, 1);
     ready.text1.initialize(canvas,ctx,GAME_SETTINGS,{
       text:{
         x: GAME_SETTINGS.WIDTH/2,
@@ -210,7 +182,7 @@ var ready = {
         textBaseline: "middle",
         textAlign: "center",
         lineWidth: 2,
-        message: "An apponents has been found, click 'ready' when you are",
+        message: "An apponent has been found, click 'READY' when you are",
         globalAlpha: undefined,
         color: {fill: undefined, stroke: undefined},
         colorData: {
@@ -285,4 +257,11 @@ function drawBackground(ctx,globalAlpha,color){
     ctx.fillStyle = color?color:GAME_SETTINGS.BACKGROUND_COLOR;
     ctx.fillRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
     ctx.restore();
+}
+
+function drawGrayzonePlanets(ctx,serverObjects){
+  for(object in serverObjects){
+    obj = serverObjects[object];
+    Drawobjects(ctx,obj);
+  }
 }
