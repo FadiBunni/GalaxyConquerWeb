@@ -411,7 +411,7 @@ var backToOpeningScene = {
     }
   },
 
-  destroy: function(socket){}
+  destroy: function(){}
 };
 
 
