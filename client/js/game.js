@@ -3,7 +3,7 @@ const STATES = require('./utils/STATES.js');
 var GAME_SETTINGS = null;
 var Interval = 10;
 
-const socket = io();
+var socket = io();
 
 var ctx = canvas.getContext('2d');
 
@@ -25,9 +25,12 @@ socket.on('total user count updated', function(count){
 window.document.title = GAME_SETTINGS.TITLE+" ("+count+")";
 });
 
-//position is not necissary yet, but might be.
-socket.on('ready', function(position){
+socket.on('ready', function(){
 	STATES.ready.initialize(canvas,ctx,socket,GAME_SETTINGS,serverObjects);
+});
+
+socket.on('init', function(statuses){
+	serverObjects = statuses;
 });
 
 socket.on('playing', function(){
@@ -39,8 +42,8 @@ socket.on('update', function(statuses){
 	serverObjects = statuses;
 });
 
-socket.on('destroy', function(message){
+socket.on('destroy', function(SERVER_MESSAGE){
 	STATES.ready.destroy();
 	STATES.playing.destroy();
-	//STATES.backToTitle.initialize(message);
+	STATES.backToOpeningScene.initialize(canvas,ctx,socket,GAME_SETTINGS,SERVER_MESSAGE);
 });

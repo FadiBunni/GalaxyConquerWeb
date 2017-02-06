@@ -50,7 +50,5 @@ io.on('connection', function(socket){
     //     var roomIndex = roomManager.roomIndex[socket.id];
     //     if(roomIndex) roomManager.rooms[roomIndex].objects[socket.id].ready = true;
     // });
-
-
 });
 

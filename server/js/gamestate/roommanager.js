@@ -25,8 +25,8 @@ function RoomManager(io){
 
 		STATES.ready.initialize(io, room);
 		// //Emit to players that they are ready, and their side on the map
-		io.to(player0.id).emit('ready', 'left');
-		io.to(player1.id).emit('ready', 'right');
+		io.to(player0.id).emit('ready');
+		io.to(player1.id).emit('ready');
 		console.log('Room Created: ', roomId);
 
 	};
@@ -38,7 +38,7 @@ function RoomManager(io){
 		/*Loop through all players if they are not ready and if the timer has not finished
 		delete player by their socket.id in the roomIndex and and emit to socketid a message */
 		room.players.forEach(function(socket){
-			var message = "deleted!";//(!room.objects[socket.id].ready && !room.objects.countdown) ? "You are not prepared": null ;
+			var message = (!room.objects.countdown) ? "You are not prepared": null ;//(!room.objects[socket.id].ready && !room.objects.countdown) ? "You are not prepared": null ;
 			delete RmMg.roomIndex[socket.id];
 			io.to(socket.id).emit('destroy', message);
 		});

@@ -1,4 +1,4 @@
-//const Countdown = require('./countdown.js');
+const Countdown = require('./countdown.js');
 const SETTINGS = require('./SETTINGS.js');
 
 var ready = {
@@ -8,15 +8,15 @@ var ready = {
 		//Set the loop in the room "class" equal to the loop in ready object
 		room.loop = this.loop;
 		var statuses = getAllStatsFromPlanets(room);
-		io.to(room.id).emit('update', statuses);
+		io.to(room.id).emit('init', statuses);
 		//Add countdown to the room.object array and instantiate a new one
-		//room.objects.countdown = new Countdown(10,null,SETTINGS.HEIGHT-40);
-    	//room.objects.countdown.action = function(room){
+		room.objects.countdown = new Countdown(10,null,SETTINGS.HEIGHT-40);
+    	room.objects.countdown.action = function(room){
     		/*Destroy can be called because RmMg is inside the room contructor.
 			Calling the destroy function in RmMg not in this 'ready' variable*/
-     // 		delete room.objects.countdown;
-     //  		room.RmMg.destroy(room.id);
-    	// };
+     		delete room.objects.countdown;
+      		room.RmMg.destroy(room.id);
+    	};
 	},
 
 	loop: function(room){
@@ -27,8 +27,8 @@ var ready = {
 		// 	playing.initialize(ready.io,room);
 		// }
 		//get statuses from all the objects in the room array, and send it to client
-		var statuses = getPlanetScoreNumberFromPlanets(room);
-		ready.io.to(room.id).emit('update', statuses);
+		// var statuses = getPlanetScoreNumberFromPlanets(room);
+		// ready.io.to(room.id).emit('update', statuses);
 		/*You can return the data, so it can be consoled.log in room class
 		within the room.runLoop method.*/
 		//return statuses;

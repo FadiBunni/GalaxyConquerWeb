@@ -7,7 +7,7 @@ function LobbyManager(io){
 	LbMg.push = function(socket){
 		//if the element does not exist in the array add one.
 		if(LbMg.lobby.indexOf(socket) < 0){
-			//console.log('lobbyin: ' + socket.id);
+			console.log('lobbyin: ' + socket.id);
 			LbMg.lobby.push(socket);
 		}
 	};
