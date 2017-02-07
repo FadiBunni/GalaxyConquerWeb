@@ -1,23 +1,54 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 function drawObjects(ctx,status){
+  //console.log(status);
 	switch(status.shape){
-	  case "circle":
-	  	var status = status.cic;
-	  	ctx.save();
-	    ctx.fillStyle = status.color;
-	    ctx.globalAlpha = 0.85;
-	    ctx.beginPath();
-	    ctx.arc(status.x,status.y,status.planetSize,0,2*Math.PI);
-	    ctx.stroke();
-	    ctx.fill();
-	    ctx.textBaseline="middle";
-	    ctx.textAlign = 'center';
-	    ctx.fillStyle = "white";
-	    ctx.font = "16px verdana";
-	    ctx.fillText(status.planetScoreNumber,status.x,status.y);
-	    ctx.restore();
+	  // case "circle":
+	  // 	var status = status.cic;
+	  // 	drawPlanets(ctx,status);
+	  //   break;
+	  case "text":
+      var status = status.text;
+	  	drawText(ctx,status);
 	    break;
+
 	}
+}
+
+function drawPlanets(ctx, status){
+	ctx.save();
+    ctx.fillStyle = status.color;
+    ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    ctx.arc(status.x,status.y,status.planetSize,0,2*Math.PI);
+    ctx.stroke();
+    ctx.fill();
+    ctx.textBaseline="middle";
+    ctx.textAlign = 'center';
+    ctx.fillStyle = "white";
+    ctx.font = "16px verdana";
+    ctx.fillText(status.planetScoreNumber,status.x,status.y);
+    ctx.restore();
+}
+
+function drawText(ctx, status){
+  if(!status.color) return;
+  ctx.save();
+  ctx.beginPath();
+
+  ctx.font = status.size+"px "+status.font;
+  ctx.textAlign = status.textAlign;
+  ctx.textBaseline = status.textBaseline;
+  ctx.globalAlpha = status.globalAlpha!==undefined?status.globalAlpha:1;
+  if(status.color.stroke){
+    ctx.strokeStyle = status.color.stroke;
+    ctx.lineWidth = status.lineWidth;
+    ctx.strokeText(status.message, status.x, status.y);
+  }
+  if(status.color.fill){
+    ctx.fillStyle = status.color.fill;
+    ctx.fillText(status.message, status.x, status.y);
+  }
+  ctx.restore();
 }
 
 module.exports = drawObjects;
@@ -56,6 +87,7 @@ socket.on('ready', function(){
 
 socket.on('init', function(statuses){
 	serverObjects = statuses;
+	//console.log(statuses);
 });
 
 socket.on('playing', function(){
@@ -65,6 +97,8 @@ socket.on('playing', function(){
 
 socket.on('update', function(statuses){
 	serverObjects = statuses;
+	//STATES.setServerObjects(serverObjects);
+	//console.log(statuses);
 });
 
 socket.on('destroy', function(SERVER_MESSAGE){
@@ -107,7 +141,7 @@ var start = {
   initialize: function(canvas,ctx,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
   	this.misc(canvas,ctx,socket,GAME_SETTINGS);
-    Img('spaceship',ctx);
+    //Img('spaceship',ctx);
     start.button1.initialize(canvas,ctx,GAME_SETTINGS, {
       text:{
         x: undefined,
@@ -183,7 +217,7 @@ var waiting = {
 
   initialize: function(canvas,ctx,GAME_SETTINGS){
     this.misc();
-    Img('spaceship',ctx);
+    //Img('spaceship',ctx);
     waiting.text1.initialize(canvas,ctx,GAME_SETTINGS,{
       text:{
         x: undefined,
@@ -247,9 +281,15 @@ var ready = {
     this.misc(socket,ctx,GAME_SETTINGS,serverObjects);
     ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
 
-    Img('spaceship',ctx,function(){
-      drawGrayzonePlanets(ctx,serverObjects);
-    });
+    // Img('spaceship',ctx,function(){
+    //   drawObjects(ctx,serverObjects);
+    // });
+    //console.log(serverObjects);
+
+    //console.log(serverObjects);
+    //drawObjects(ctx,serverObjects);
+    //drawObjects(ctx,serverObjects);
+    //Drawobjects(ctx,serverObjects);
 
     ready.text1.initialize(canvas,ctx,GAME_SETTINGS,{
       text:{
@@ -415,11 +455,24 @@ var backToOpeningScene = {
 };
 
 
-module.exports = {start,waiting,ready,playing,backToOpeningScene};
+module.exports = {start,waiting,ready,playing,backToOpeningScene, setServerObjects};
 
-function drawGrayzonePlanets(ctx,serverObjects){
+function setServerObjects(serverObjects){
+
+  this.serverObjects = serverObjects;
+  console.log(serverObjects);
+}
+
+
+
+
+
+
+
+function drawObjects(ctx,serverObjects){
   for(object in serverObjects){
     obj = serverObjects[object];
+    //console.log(serverObjects);
     Drawobjects(ctx,obj);
   }
 }

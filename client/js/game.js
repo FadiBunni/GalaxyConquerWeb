@@ -31,6 +31,7 @@ socket.on('ready', function(){
 
 socket.on('init', function(statuses){
 	serverObjects = statuses;
+	//console.log(statuses);
 });
 
 socket.on('playing', function(){
@@ -40,6 +41,8 @@ socket.on('playing', function(){
 
 socket.on('update', function(statuses){
 	serverObjects = statuses;
+	//STATES.setServerObjects(serverObjects);
+	//console.log(statuses);
 });
 
 socket.on('destroy', function(SERVER_MESSAGE){

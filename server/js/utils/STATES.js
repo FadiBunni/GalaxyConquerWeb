@@ -6,9 +6,11 @@ var ready = {
 		this.io = io;
 		room.status = "ready";
 		//Set the loop in the room "class" equal to the loop in ready object
-		room.loop = this.loop;
 		var statuses = getAllStatsFromPlanets(room);
+		console.log(statuses);
 		io.to(room.id).emit('init', statuses);
+		room.loop = this.loop;
+
 		//Add countdown to the room.object array and instantiate a new one
 		room.objects.countdown = new Countdown(10,null,SETTINGS.HEIGHT-40);
     	room.objects.countdown.action = function(room){
@@ -26,8 +28,12 @@ var ready = {
 		// if(player0ready && player1ready) {
 		// 	playing.initialize(ready.io,room);
 		// }
+		var statuses = getCountdownMessage(room);
+		console.log(statuses);
+		ready.io.to(room.id).emit('update', statuses);
 		//get statuses from all the objects in the room array, and send it to client
 		// var statuses = getPlanetScoreNumberFromPlanets(room);
+		// var statuses = getCountdownMessage(room);
 		// ready.io.to(room.id).emit('update', statuses);
 		/*You can return the data, so it can be consoled.log in room class
 		within the room.runLoop method.*/
@@ -53,8 +59,8 @@ var playing = {
 
 	loop: function(room){
 		//get statuses from all the objects in the room array, and send it to client
-		var statuses = getAllStatsFromPlanets(room);
-		playing.io.to(room.id).emit('update', statuses);
+		// var statuses = getCountdownMessage(room);
+		// playing.io.to(room.id).emit('update', statuses);
 		// if(room.status == "playing" && (room.objects[room.players[0].id].score>=SETTINGS.GOAL || room.objects[room.players[1].id].score>=SETTINGS.GOAL)){
 		// 	room.status = "gameOver";
 		// } else if(room.status == "gameOver"){
@@ -85,6 +91,21 @@ function getAllStatsFromPlanets(room){
 	}
 	//console.log(statuses);
 	return statuses;
+}
+
+function getCountdownMessage(room){
+	var statuses = [];
+	//Object is all the objects in the object array in room "class".
+	room.objects.countdown.update(room);
+	// for(object in room.objects){
+	// 	var obj = room.objects[object];
+	// 	console.log(obj.countdown);
+	// }
+	if(room.objects.countdown){
+		return room.objects.countdown.status;
+	}	
+	//console.log(statuses);
+	//return statuses;
 }
 
 function getPlanetScoreNumberFromPlanets(room){

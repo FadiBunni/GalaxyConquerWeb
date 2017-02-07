@@ -5,7 +5,7 @@ function grayzonePlanets(id){
 	Baseobject.call(this);
 	var windowCollisionDistance = 10;
 	var planetSize = Math.round(randomPlanetIntervalSize(50,80));
-	var planetScoreNumber = Math.round(Math.random()*planetSize);
+	var planetScoreNumber = Math.round(Math.random()*planetSize/2);
 	const color = "#808080";
 	var xPos = Math.round((Math.random()*SETTINGS.WIDTH));
 	var yPos = Math.round((Math.random()*SETTINGS.HEIGHT));
