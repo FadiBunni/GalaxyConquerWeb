@@ -32,7 +32,7 @@ var start = {
   initialize: function(canvas,ctx,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
   	this.misc(canvas,ctx,socket,GAME_SETTINGS);
-    //Img('spaceship',ctx);
+    Img('spaceship',ctx);
     start.button1.initialize(canvas,ctx,GAME_SETTINGS, {
       text:{
         x: undefined,
@@ -108,7 +108,7 @@ var waiting = {
 
   initialize: function(canvas,ctx,GAME_SETTINGS){
     this.misc();
-    //Img('spaceship',ctx);
+    Img('spaceship',ctx);
     waiting.text1.initialize(canvas,ctx,GAME_SETTINGS,{
       text:{
         x: undefined,
@@ -152,7 +152,7 @@ var ready = {
       socket.emit('ready');
       ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
       Img('spaceship',ctx,function(){
-       drawGrayzonePlanets(ctx,serverObjects);
+       drawObjects(ctx,serverObjects);
       });
       ready.text1.data.text.message = "waiting for opponent to be ready";
       delete ready.button1.data;
@@ -172,15 +172,9 @@ var ready = {
     this.misc(socket,ctx,GAME_SETTINGS,serverObjects);
     ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
 
-    // Img('spaceship',ctx,function(){
-    //   drawObjects(ctx,serverObjects);
-    // });
-    //console.log(serverObjects);
-
-    //console.log(serverObjects);
-    //drawObjects(ctx,serverObjects);
-    //drawObjects(ctx,serverObjects);
-    //Drawobjects(ctx,serverObjects);
+    Img('spaceship',ctx,function(){
+      drawObjects(ctx,serverObjects);
+    });
 
     ready.text1.initialize(canvas,ctx,GAME_SETTINGS,{
       text:{
@@ -233,7 +227,15 @@ var ready = {
         dir: 10,
       }
     });
-    mainLoop = ready.loop;
+   mainLoop = ready.loop;
+  },
+
+  updateObjects: function(ctx, serverObjects){
+    if(serverObjects)
+      //for countdown
+      Drawobjects(ctx,serverObjects);
+      //for planets
+      drawObjects(ctx,serverObjects);
   },
 
   loop: function(){
@@ -346,24 +348,13 @@ var backToOpeningScene = {
 };
 
 
-module.exports = {start,waiting,ready,playing,backToOpeningScene, setServerObjects};
-
-function setServerObjects(serverObjects){
-
-  this.serverObjects = serverObjects;
-  console.log(serverObjects);
-}
-
-
-
-
-
+module.exports = {start,waiting,ready,playing,backToOpeningScene};
 
 
 function drawObjects(ctx,serverObjects){
   for(object in serverObjects){
     obj = serverObjects[object];
-    //console.log(serverObjects);
+    //console.log(obj);
     Drawobjects(ctx,obj);
   }
 }

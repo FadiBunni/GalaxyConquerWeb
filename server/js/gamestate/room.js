@@ -11,8 +11,8 @@ function Room (RmMg, io, id, player0, player1){
 	Rm.objects = {};
 
 	//Add players.
-	Rm.objects[Object.keys(Rm.objects).length] = new playerPlanet(Object.keys(Rm.objects).length,Rm.players[0].id,"left",115,115,100,100);
-	Rm.objects[Object.keys(Rm.objects).length] = new playerPlanet(Object.keys(Rm.objects).length,Rm.players[1].id,"right",1165,685,100,100);
+	Rm.objects[Rm.players[0].id] = new playerPlanet(Object.keys(Rm.objects).length,Rm.players[0].id,"left",115,115,100,100);
+	Rm.objects[Rm.players[1].id] = new playerPlanet(Object.keys(Rm.objects).length,Rm.players[1].id,"right",1165,685,100,100);
 	//Spawns grayzoneplanets with window collision and planet collision, see the functions below and in grayzonePlanets class.
 	spawnGrayzonePlanets(Rm,amoutOfGrayzonePlanet,grayzonePlanet, planetDistance);
 	// console.log(Rm.objects[0]);
@@ -20,22 +20,13 @@ function Room (RmMg, io, id, player0, player1){
 	// console.log(Object.keys(Rm.objects).length);
 
 
-	/*Add to object player.id(socket.id) as a new player form the player class.
-	Also add other stuff in the object array.*/
-
-	// Rm.objects[Rm.players[0].id] = new Player(Rm.players[0].id, "LEFT");
-	// Rm.objects[Rm.players[1].id] = new Player(Rm.players[1].id, "RIGHT");
-	// Rm.objects.player0Score = new Score(Rm.players[0].id, "LEFT");
-	// Rm.objects.player1Score = new Score(Rm.players[1].id, "RIGHT");
-	// Rm.objects.ball = new Ball(Rm.players[0].id, Rm.players[1].id);
-
 	//The room.loop is set in STATES.js!!!!!!!!
 	Rm.runLoop = function(room) {
 		//Too console.log the objects info, you need to return the data in STATES.js, see loop.
 		// console.log("All objects: ");
 		// console.log(room.loop(room));
 		room.loop(room);
-		//room.playSounds();
+
 	};
 }
 module.exports = Room;

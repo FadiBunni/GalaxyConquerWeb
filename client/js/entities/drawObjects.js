@@ -1,15 +1,14 @@
 function drawObjects(ctx,status){
-  //console.log(status);
+  console.log(status);
 	switch(status.shape){
-	  // case "circle":
-	  // 	var status = status.cic;
-	  // 	drawPlanets(ctx,status);
-	  //   break;
+	  case "circle":
+	  	var status = status.cic;
+	  	drawPlanets(ctx,status);
+	    break;
 	  case "text":
       var status = status.text;
 	  	drawText(ctx,status);
 	    break;
-
 	}
 }
 
@@ -31,6 +30,7 @@ function drawPlanets(ctx, status){
 
 function drawText(ctx, status){
   if(!status.color) return;
+  ctx.clearRect(status.x-23,status.y-25,49,45);
   ctx.save();
   ctx.beginPath();
 

@@ -7,7 +7,7 @@ var socket = io();
 
 var ctx = canvas.getContext('2d');
 
-var serverObjects=[];
+var serverObjects = []
 
 socket.on('connected', function(SERVER_GAME_SETTINGS){
 	GAME_SETTINGS = SERVER_GAME_SETTINGS;
@@ -31,18 +31,18 @@ socket.on('ready', function(){
 
 socket.on('init', function(statuses){
 	serverObjects = statuses;
-	//console.log(statuses);
+	//console.log(serverObjects);
+});
+
+socket.on('update', function(statuses){
+	serverObjects = statuses;
+	STATES.ready.updateObjects(ctx,serverObjects);
+	console.log(serverObjects);
 });
 
 socket.on('playing', function(){
 	STATES.ready.destroy();
 	STATES.playing.initialize();
-});
-
-socket.on('update', function(statuses){
-	serverObjects = statuses;
-	//STATES.setServerObjects(serverObjects);
-	//console.log(statuses);
 });
 
 socket.on('destroy', function(SERVER_MESSAGE){

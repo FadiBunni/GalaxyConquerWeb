@@ -46,9 +46,9 @@ io.on('connection', function(socket){
         io.emit('total user count updated', socket.server.eio.clientsCount);
     });
 
-    // socket.on('ready', function(){
-    //     var roomIndex = roomManager.roomIndex[socket.id];
-    //     if(roomIndex) roomManager.rooms[roomIndex].objects[socket.id].ready = true;
-    // });
+    socket.on('ready', function(){
+        var roomIndex = roomManager.roomIndex[socket.id];
+        if(roomIndex) roomManager.rooms[roomIndex].objects[socket.id].ready = true;
+    });
 });
 
