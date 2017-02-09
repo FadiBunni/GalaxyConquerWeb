@@ -49,16 +49,16 @@ function checkPlanetCollision(Rm,currentGrayzonePlanet,planetDistance){
 		var obj = Rm.objects[object];
 		//console.log(obj);
 
-		var currentGrayzonePlanetGetX = currentGrayzonePlanet.status.cic.x;
-		var currentGrayzonePlanetGetY = currentGrayzonePlanet.status.cic.y;
-		var currentGrayzonePlanetPlanetSize = currentGrayzonePlanet.status.cic.planetSize;
+		var currentGrayzonePlanetGetX = currentGrayzonePlanet.status.planet.x;
+		var currentGrayzonePlanetGetY = currentGrayzonePlanet.status.planet.y;
+		var currentGrayzonePlanetPlanetSize = currentGrayzonePlanet.status.planet.planetSize;
 		//console.log("obj: " + obj.status.cic.x);
 
-		var dx = currentGrayzonePlanetGetX - obj.status.cic.x;
-		var dy = currentGrayzonePlanetGetY - obj.status.cic.y;
+		var dx = currentGrayzonePlanetGetX - obj.status.planet.x;
+		var dy = currentGrayzonePlanetGetY - obj.status.planet.y;
 		var distance  = Math.sqrt(dx * dx + dy * dy);
 
-		var radiusSum = currentGrayzonePlanetPlanetSize + obj.status.cic.planetSize;
+		var radiusSum = currentGrayzonePlanetPlanetSize + obj.status.planet.planetSize;
 		if(distance < radiusSum + planetDistance){
 			return true;
 		}

@@ -44,6 +44,7 @@ var ready = {
 var playing = {
 	initialize: function(io,room){
 		this.io = io;
+		this.room=room;
 		room.status = "countdown";
 		//Set the loop in the room "class" equal to the loop in ready object
 
@@ -54,19 +55,30 @@ var playing = {
    		};
    		/*Since ready.io is the parameter for playing.initialize
    		We dont need to write playing.io... */
-   		room.loop = this.loop;
-    	io.to(room.id).emit('playing');
+   		room.loop = this.preloop;
+	},
 
+	preloop: function(room){
+		if(room.objects.countdown){
+			if(room.objects.countdown.status.count.message !== 0){
+				var statuses = getCountdownMessage(room);
+				//console.log(statuses);
+				playing.io.to(room.id).emit('update', statuses);
+			}
+			if(room.objects.countdown.status.count.message == 0){
+				playing.io.to(room.id).emit('playing');
+				playing.room.loop = playing.loop
+
+			}
+		}
 	},
 
 	loop: function(room){
-		var statuses = getCountdownMessage(room);
+		console.log('playing')
+		var statuses = getAllStatsFromPlanetsUpdate(room);
 		//console.log(statuses);
-		ready.io.to(room.id).emit('update', statuses);
+		playing.io.to(room.id).emit('update', statuses);
 
-		var statuses = getPlanetScoreNumberFromPlanets(room);
-
-		ready.io.to(room.id).emit('update', statuses);
 		//get statuses from all the objects in the room array, and send it to client
 		// var statuses = getCountdownMessage(room);
 		// playing.io.to(room.id).emit('update', statuses);
@@ -95,7 +107,7 @@ function getAllStatsFromPlanets(room){
 		//Get the specific class/entity.
 		var obj = room.objects[object];
 		//console.log("obj: " + obj.status);
-		statuses.push(obj.status);
+		statuses.push(obj.status.planet);
 		//console.log("obj.status: " + obj);
 	}
 
@@ -103,31 +115,22 @@ function getAllStatsFromPlanets(room){
 }
 
 function getCountdownMessage(room){
-	//var statuses = [];
-
-	if(!room.objects.countdown){
-		return;
-	}
-	room.objects.countdown.update(room);
-	if(room.objects.countdown && room.objects.countdown.status){
-		room.objects.countdown.update(room);
-		return room.objects.countdown.status;
-	}
-
-
-
+	var statuses = [];
 
 	//Object is all the objects in the object array in room "class".
-	// for(object in room.objects){
-	// 	var obj = room.objects[object];
-	// 	obj.update(room);
-	// 	statuses.push(obj.status);
-	// }
-	// console.log(statuses);
-	// return statuses;
+	for(object in room.objects){
+		var obj = room.objects[object];
+		obj.update(room);
+		if(obj.status.count){
+			//console.log(obj.status.count);
+			statuses.push(obj.status.count);
+		}
+	}
+	// //console.log(statuses);
+	return statuses;
 }
 
-function getPlanetScoreNumberFromPlanets(room){
+function getAllStatsFromPlanetsUpdate(room){
 	var statuses = [];
 	//Object is all the objects in the object array in room "class".
 	for(var object in room.objects){
@@ -137,9 +140,10 @@ function getPlanetScoreNumberFromPlanets(room){
 		//console.log("obj: " + obj.status);
 		//Update all the classes with an update method and push all statuses in every object.
 		obj.update(room);
-		console.log(obj);
-		statuses.push(obj.status.cic);
-		//console.log("obj.status: " + obj);
+		if(obj.status.planet){
+			console.log(obj.status.planet);
+			statuses.push(obj.status.planet);
+		}
 	}
 	//console.log(statuses);
 	return statuses;

@@ -1,37 +1,40 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 function drawObjects(ctx,status){
-  console.log(status);
-	switch(status.shape){
-	  case "circle":
-	  	var status = status.cic;
-	  	drawPlanets(ctx,status);
-	    break;
-	  case "text":
-      var status = status.text;
-	  	drawText(ctx,status);
-	    break;
-	}
+  //console.log(status.role);
+  switch(status.role){
+    case "countdown":
+      //console.log('countdown');
+      drawText(ctx,status);
+      break;
+    case "grayzonePlanet":
+      //console.log('grayzonePlanet');
+      drawPlanets(ctx,status);
+      break;
+    case "playerPlanet":
+      //console.log('playerPlanet');
+      drawPlanets(ctx,status);
+      break;
+  }
 }
 
 function drawPlanets(ctx, status){
-	ctx.save();
-    ctx.fillStyle = status.color;
-    ctx.globalAlpha = 0.85;
-    ctx.beginPath();
-    ctx.arc(status.x,status.y,status.planetSize,0,2*Math.PI);
-    ctx.stroke();
-    ctx.fill();
-    ctx.textBaseline="middle";
-    ctx.textAlign = 'center';
-    ctx.fillStyle = "white";
-    ctx.font = "16px verdana";
-    ctx.fillText(status.planetScoreNumber,status.x,status.y);
-    ctx.restore();
+  ctx.save();
+  ctx.fillStyle = status.color;
+  ctx.globalAlpha = 0.85;
+  ctx.beginPath();
+  ctx.arc(status.x,status.y,status.planetSize,0,2*Math.PI);
+  ctx.stroke();
+  ctx.fill();
+  ctx.textBaseline="middle";
+  ctx.textAlign = 'center';
+  ctx.fillStyle = "white";
+  ctx.font = "16px verdana";
+  ctx.fillText(status.planetScoreNumber,status.x,status.y);
+  ctx.restore();
 }
 
 function drawText(ctx, status){
   if(!status.color) return;
-  ctx.clearRect(status.x-23,status.y-25,49,45);
   ctx.save();
   ctx.beginPath();
 
@@ -63,8 +66,6 @@ var socket = io();
 
 var ctx = canvas.getContext('2d');
 
-var serverObjects = []
-
 socket.on('connected', function(SERVER_GAME_SETTINGS){
 	GAME_SETTINGS = SERVER_GAME_SETTINGS;
 	const canvas = cUtils.generateCanvas(GAME_SETTINGS.WIDTH, GAME_SETTINGS.HEIGHT);
@@ -78,27 +79,26 @@ socket.on('new user entered', function(){
 
 //Total user count update
 socket.on('total user count updated', function(count){
-window.document.title = GAME_SETTINGS.TITLE+" ("+count+")";
+	window.document.title = GAME_SETTINGS.TITLE+" ("+count+")";
 });
 
 socket.on('ready', function(){
-	STATES.ready.initialize(canvas,ctx,socket,GAME_SETTINGS,serverObjects);
+	STATES.ready.initialize(canvas,ctx,socket,GAME_SETTINGS);
 });
 
 socket.on('init', function(statuses){
-	serverObjects = statuses;
-	//console.log(serverObjects);
+	STATES.setServerObjects(statuses);
+	//console.log(statuses);
 });
 
 socket.on('update', function(statuses){
-	serverObjects = statuses;
-	STATES.ready.updateObjects(ctx,serverObjects);
-	console.log(serverObjects);
+	STATES.setServerTimerMessage(statuses);
+	//console.log(statuses);
 });
 
 socket.on('playing', function(){
 	STATES.ready.destroy();
-	STATES.playing.initialize();
+	STATES.playing.initialize(canvas,ctx,socket,GAME_SETTINGS);
 });
 
 socket.on('destroy', function(SERVER_MESSAGE){
@@ -111,9 +111,10 @@ const Drawobjects = require('../entities/drawObjects.js');
 const Img    = require('./imgimport.js');
 const Button = require('./button.js');
 const Text   = require('./text.js');
-const INTERVAL = 10;
+const INTERVAL = 45;
 
 var params = [];
+var serverObjects = [];
 
 var mainLoop = function(){};
 var interval = setInterval(function(){
@@ -252,7 +253,7 @@ var waiting = {
 };
 
 var ready = {
-  misc: function(socket,ctx,GAME_SETTINGS,serverObjects){
+  misc: function(socket,ctx,GAME_SETTINGS){
     var self = this;
     self.text1 = new Text();
     self.button1 = new Button();
@@ -261,7 +262,7 @@ var ready = {
       socket.emit('ready');
       ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
       Img('spaceship',ctx,function(){
-       drawObjects(ctx,serverObjects);
+        drawObjects(ctx,serverObjects);
       });
       ready.text1.data.text.message = "waiting for opponent to be ready";
       delete ready.button1.data;
@@ -277,10 +278,9 @@ var ready = {
       text.globalAlpha = 0.5 + 0.5*(animation.count/1000);
     };
   },
-  initialize: function(canvas,ctx,socket,GAME_SETTINGS,serverObjects){
-    this.misc(socket,ctx,GAME_SETTINGS,serverObjects);
+  initialize: function(canvas,ctx,socket,GAME_SETTINGS){
+    this.misc(socket,ctx,GAME_SETTINGS);
     ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-
     Img('spaceship',ctx,function(){
       drawObjects(ctx,serverObjects);
     });
@@ -339,20 +339,18 @@ var ready = {
    mainLoop = ready.loop;
   },
 
-  updateObjects: function(ctx, serverObjects){
-    if(serverObjects)
-      //for countdown
-      Drawobjects(ctx,serverObjects);
-      //for planets
-      drawObjects(ctx,serverObjects);
-  },
-
   loop: function(){
+    ready.update();
     if(ready.button1.data){
       ready.button1.update();
       ready.button1.draw();
     }
     ready.text1.draw();
+
+  },
+
+  update: function(){
+    drawTimerMessage(params[1], serverObjects);
   },
 
   destroy:function(){
@@ -364,10 +362,32 @@ var ready = {
 };
 
 var playing = {
-  misc: function(){},
-  initialize: function(){},
-  loop: function(){},
-  destroy:function(){}
+  misc: function(){
+
+  },
+
+  initialize: function(canvas,ctx,socket,GAME_SETTINGS){
+    this.misc(socket,ctx,GAME_SETTINGS);
+    ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+    Img('spaceship',ctx);
+
+
+
+
+    mainLoop = playing.loop;
+  },
+
+  loop: function(){
+    ready.update();
+  },
+
+  update: function(){
+    //drawObjects(params[1],serverObjects);
+  },
+
+  destroy:function(){
+
+  }
 };
 
 var backToOpeningScene = {
@@ -456,16 +476,43 @@ var backToOpeningScene = {
   destroy: function(){}
 };
 
-
-module.exports = {start,waiting,ready,playing,backToOpeningScene};
-
+module.exports = {start,waiting,ready,playing,backToOpeningScene,setServerObjects,setServerTimerMessage};
 
 function drawObjects(ctx,serverObjects){
-  for(object in serverObjects){
-    obj = serverObjects[object];
-    //console.log(obj);
+  this.serverObjects = serverObjects;
+  for(objects in serverObjects){
+    obj = serverObjects[objects];
     Drawobjects(ctx,obj);
   }
+  //console.log(obj);
+}
+
+function drawTimerMessage(ctx, serverObjects){
+  this.serverObjects = serverObjects;
+  for(objects in serverObjects){
+    obj = serverObjects[objects];
+    Drawobjects(ctx,obj);
+  }
+  //console.log(obj);
+}
+
+function setServerObjects(statuses){
+  this.statuses = statuses;
+  for(status in statuses){
+    stat = statuses[status];
+    serverObjects.push(stat)
+  }
+  //console.log(serverObjects);
+}
+
+function setServerTimerMessage(statuses){
+  serverObjects = [];
+  this.statuses = statuses;
+  for(status in statuses){
+    stat = statuses[status];
+    serverObjects.push(stat)
+  };
+  //console.log(serverObjects);
 }
 },{"../entities/drawObjects.js":1,"./button.js":4,"./imgimport.js":6,"./text.js":7}],4:[function(require,module,exports){
 const Text = new (require('./text.js'));

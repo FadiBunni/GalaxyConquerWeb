@@ -38,7 +38,7 @@ function RoomManager(io){
 		/*Loop through all players if they are not ready and if the timer has not finished
 		delete player by their socket.id in the roomIndex and and emit to socketid a message */
 		room.players.forEach(function(socket){
-			var message = (!room.objects.countdown) ? "You are not prepared": null ;//(!room.objects[socket.id].ready && !room.objects.countdown) ? "You are not prepared": null ;
+			var message = (!room.objects[socket.id].ready && !room.objects.countdown) ? "You are were not prepared": null ;
 			delete RmMg.roomIndex[socket.id];
 			io.to(socket.id).emit('destroy', message);
 		});

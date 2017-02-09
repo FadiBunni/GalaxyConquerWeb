@@ -1,36 +1,39 @@
 function drawObjects(ctx,status){
-  console.log(status);
-	switch(status.shape){
-	  case "circle":
-	  	var status = status.cic;
-	  	drawPlanets(ctx,status);
-	    break;
-	  case "text":
-      var status = status.text;
-	  	drawText(ctx,status);
-	    break;
-	}
+  //console.log(status.role);
+  switch(status.role){
+    case "countdown":
+      //console.log('countdown');
+      drawText(ctx,status);
+      break;
+    case "grayzonePlanet":
+      //console.log('grayzonePlanet');
+      drawPlanets(ctx,status);
+      break;
+    case "playerPlanet":
+      //console.log('playerPlanet');
+      drawPlanets(ctx,status);
+      break;
+  }
 }
 
 function drawPlanets(ctx, status){
-	ctx.save();
-    ctx.fillStyle = status.color;
-    ctx.globalAlpha = 0.85;
-    ctx.beginPath();
-    ctx.arc(status.x,status.y,status.planetSize,0,2*Math.PI);
-    ctx.stroke();
-    ctx.fill();
-    ctx.textBaseline="middle";
-    ctx.textAlign = 'center';
-    ctx.fillStyle = "white";
-    ctx.font = "16px verdana";
-    ctx.fillText(status.planetScoreNumber,status.x,status.y);
-    ctx.restore();
+  ctx.save();
+  ctx.fillStyle = status.color;
+  ctx.globalAlpha = 0.85;
+  ctx.beginPath();
+  ctx.arc(status.x,status.y,status.planetSize,0,2*Math.PI);
+  ctx.stroke();
+  ctx.fill();
+  ctx.textBaseline="middle";
+  ctx.textAlign = 'center';
+  ctx.fillStyle = "white";
+  ctx.font = "16px verdana";
+  ctx.fillText(status.planetScoreNumber,status.x,status.y);
+  ctx.restore();
 }
 
 function drawText(ctx, status){
   if(!status.color) return;
-  ctx.clearRect(status.x-23,status.y-25,49,45);
   ctx.save();
   ctx.beginPath();
 

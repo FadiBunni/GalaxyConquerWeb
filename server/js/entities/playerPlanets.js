@@ -12,13 +12,15 @@ function playerPlanets(id,playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 	this.color = side=="left"?"#FF0000":"#008000";
 	this.ready = false;
 
-
 	//One way to determin if grayzone or playerplanet is by using role.
 	this.role = "playerPlanet";
-	this.status.shape = "circle";
-	this.status.cic   = {
-		id:id,
+	this.status.score ={
 		role:this.role,
+		planetScoreNumber:planetScoreNumber
+	};
+	this.status.planet  = {
+		role:this.role,
+		id:id,
 		planetSize:planetSize,
 		planetScoreNumber:planetScoreNumber,
 		color:this.color,
@@ -26,9 +28,8 @@ function playerPlanets(id,playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 		y:yPos
 	};
 
-	//remove this metod when you have updated the STATE.
 	this.update = function(room){
-		this.status.cic.planetScoreNumber++;
+		this.status.planet.planetScoreNumber++;
 	};
 }
 

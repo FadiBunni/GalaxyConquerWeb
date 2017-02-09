@@ -12,8 +12,7 @@ function grayzonePlanets(id){
 
 	this.id = id;
 	this.role = "grayzonePlanet";
-	this.status.shape = "circle";
-	this.status.cic   = {
+	this.status.planet   = {
 		id:id,
 		role:this.role,
 		planetSize:planetSize,
