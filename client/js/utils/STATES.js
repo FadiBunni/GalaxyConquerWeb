@@ -32,7 +32,6 @@ var start = {
 
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
-
   	this.misc(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
     Img('spaceship',ctxS);
     start.button1.initialize(canvasUI,ctxU,GAME_SETTINGS, {
@@ -144,19 +143,19 @@ var waiting = {
 };
 
 var ready = {
-  misc: function(socket,ctxU,GAME_SETTINGS){
+  misc: function(socket,ctxD,ctxU,GAME_SETTINGS){
     var self = this;
     self.text1 = new Text();
     self.button1 = new Button();
     self.button1.click = function(){
       //set player to be ready.
-
       ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-      ready.text1.data.text.message = "waiting for opponent to be ready";
+      //drawTimerMessage(ctxU,serverObjects);
+      drawObjects(ctxD,serverObjects);
+      ready.text1.data.text.message = "The game will start when your apponent is ready";
       delete ready.button1.data;
       ready.destroy();
       socket.emit('ready');
-
     };
     self.button1.update = function(){
       var text = this.data.text;
@@ -169,8 +168,9 @@ var ready = {
     };
   },
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
-    this.misc(socket,ctxU,GAME_SETTINGS);
+    this.misc(socket,ctxD,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+
     ready.text1.initialize(canvasUI,ctxU,GAME_SETTINGS,{
       text:{
         x: GAME_SETTINGS.WIDTH/2,

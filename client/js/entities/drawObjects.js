@@ -48,8 +48,7 @@ function drawTextOnPlanets(ctx,status){
 
 function drawText(ctx, status){
   if(!status.color) return;
-  ctx.clearRect(status.x-19,status.y-17,40,33);
-  //var imagedata = ctx.getImageData(status.x-17,status.y-17,40,33);
+  ctx.clearRect(status.x-32,status.y-22,64,42);
   ctx.save();
   ctx.beginPath();
   ctx.font = status.size+"px "+status.font;
@@ -66,9 +65,8 @@ function drawText(ctx, status){
     ctx.fillText(status.message, status.x, status.y);
   }
   if(status.message == 0){
-    ctx.clearRect(status.x-19,status.y-17,40,33);
+    //ctx.clearRect(status.x-32,status.y-22,64,42);
   }
-  //ctx.putImageData(imagedata, status.x-100,status.y);
   ctx.restore();
 }
 

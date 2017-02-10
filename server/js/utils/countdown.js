@@ -1,15 +1,16 @@
 const SETTINGS = require("./SETTINGS.js");
 const Baseobject = require("./baseobject.js");
 
-function Countdown(count,xPos,yPos,size){
+function Countdown(count,xPos,yPos,size,setColorDir){
   Baseobject.call(this);
   this.defaultCount = count?count:10;
-  this.defaultSize = size?size:40;
+  this.defaultSize = size?size:60;
   this.createdAt = Date.now();
   this.role = "countdown";
+  this.setColorDir = setColorDir;
   this.status.count = {
     role:this.role,
-    color : {fill:"#123456",stroke: undefined},
+    color : {fill:"#008000",stroke: undefined},
     font : "Arial",
     lineWidth : 10,
     textAlign : "center",
@@ -28,6 +29,21 @@ function Countdown(count,xPos,yPos,size){
     } else {
       this.status.count.size *= 0.997;
     }
+
+    if(this.setColorDir == true){
+      if(count <=3){
+       this.status.count.color.fill = "#FF0000";
+      }
+    }
+    if(this.setColorDir == false){
+      this.status.count.color.fill = "#008000";
+      if(count <=3){
+        this.status.count.color.fill = "#FF0000";
+      }
+    }
+
+
+
     if(count<0){
       this.action(room);
     }
