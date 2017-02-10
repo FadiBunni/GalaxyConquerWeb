@@ -2,7 +2,7 @@ var grayzonePlanet = require('../entities/grayzonePlanets.js');
 var playerPlanet = require('../entities/playerPlanets.js');
 
 function Room (RmMg, io, id, player0, player1){
-	var amoutOfGrayzonePlanet = 25;
+	var amoutOfGrayzonePlanet = 20;
 	var planetDistance = 20;
 	var Rm = this;
 	Rm.RmMg = RmMg;
@@ -11,8 +11,8 @@ function Room (RmMg, io, id, player0, player1){
 	Rm.objects = {};
 
 	//Add players.
-	Rm.objects[Rm.players[0].id] = new playerPlanet(Object.keys(Rm.objects).length,Rm.players[0].id,"left",115,115,100,100);
-	Rm.objects[Rm.players[1].id] = new playerPlanet(Object.keys(Rm.objects).length,Rm.players[1].id,"right",1165,685,100,100);
+	Rm.objects[Rm.players[0].id] = new playerPlanet(Object.keys(Rm.objects).length,Rm.players[0].id,"left",115,115,100,43);
+	Rm.objects[Rm.players[1].id] = new playerPlanet(Object.keys(Rm.objects).length,Rm.players[1].id,"right",1165,685,100,43);
 	//Spawns grayzoneplanets with window collision and planet collision, see the functions below and in grayzonePlanets class.
 	spawnGrayzonePlanets(Rm,amoutOfGrayzonePlanet,grayzonePlanet, planetDistance);
 	// console.log(Rm.objects[0]);

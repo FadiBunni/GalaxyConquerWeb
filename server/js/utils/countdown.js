@@ -9,7 +9,7 @@ function Countdown(count,xPos,yPos,size){
   this.role = "countdown";
   this.status.count = {
     role:this.role,
-    color : {fill:"#123456",stroke:"#ffffff"},
+    color : {fill:"#123456",stroke: undefined},
     font : "Arial",
     lineWidth : 10,
     textAlign : "center",

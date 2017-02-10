@@ -1,4 +1,4 @@
-#canvas {
+#canvasStatic, #canvasDynamic, #canvasUI {
 	display: block;
 	position: absolute;
 	margin: auto;

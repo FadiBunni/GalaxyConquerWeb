@@ -12,10 +12,12 @@ function playerPlanets(id,playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 	this.color = side=="left"?"#FF0000":"#008000";
 	this.ready = false;
 
-	//One way to determin if grayzone or playerplanet is by using role.
 	this.role = "playerPlanet";
+	//this can be used to only send x,y and planetscore data
 	this.status.score ={
 		role:this.role,
+		x:xPos,
+		y:yPos,
 		planetScoreNumber:planetScoreNumber
 	};
 	this.status.planet  = {

@@ -6,12 +6,10 @@ var ready = {
 		this.io = io;
 		room.status = "ready";
 		//Set the loop in the room "class" equal to the loop in ready object
-
+		//Add countdown to the room.object array and instantiate a new one
 		var statuses = getAllStatsFromPlanets(room);
 		//console.log(statuses);
 		io.to(room.id).emit('init', statuses);
-
-		//Add countdown to the room.object array and instantiate a new one
 		room.objects.countdown = new Countdown(10,null,SETTINGS.HEIGHT-40);
     	room.objects.countdown.action = function(room){
     		/*Destroy can be called because RmMg is inside the room contructor.
@@ -25,15 +23,15 @@ var ready = {
 	loop: function(room){
 		var player0ready = room.objects[room.players[0].id].ready;
 		var player1ready = room.objects[room.players[1].id].ready;
+
+
 		// if both players is ready, destroy the room, and initialize the game(playing)
 		if(player0ready && player1ready) {
 			playing.initialize(ready.io,room);
 		}
-
 		var statuses = getCountdownMessage(room);
 		//console.log(statuses);
 		ready.io.to(room.id).emit('update', statuses);
-
 		//get statuses from all the objects in the room array, and send it to client
 		/*You can return the data, so it can be consoled.log in room class
 		within the room.runLoop method.*/
@@ -48,33 +46,29 @@ var playing = {
 		room.status = "countdown";
 		//Set the loop in the room "class" equal to the loop in ready object
 
-		room.objects.countdown = new Countdown(3,null,SETTINGS.HEIGHT*3/4,100);
+		room.objects.countdown = new Countdown(3,null,SETTINGS.HEIGHT/2+40);
     	room.objects.countdown.action = function(room){
       		delete room.objects.countdown;
       		room.status = "playing";
    		};
+
    		/*Since ready.io is the parameter for playing.initialize
    		We dont need to write playing.io... */
    		room.loop = this.preloop;
 	},
 
 	preloop: function(room){
-		if(room.objects.countdown){
-			if(room.objects.countdown.status.count.message !== 0){
-				var statuses = getCountdownMessage(room);
-				//console.log(statuses);
-				playing.io.to(room.id).emit('update', statuses);
-			}
-			if(room.objects.countdown.status.count.message == 0){
+		if(room.objects.countdown.status.count.message !== 0){
+			var statuses = getCountdownMessage(room);
+			if(statuses[0].message <= 0){
 				playing.io.to(room.id).emit('playing');
-				playing.room.loop = playing.loop
-
+				playing.room.loop = playing.loop;
 			}
+			playing.io.to(room.id).emit('update', statuses);
 		}
 	},
 
 	loop: function(room){
-		console.log('playing')
 		var statuses = getAllStatsFromPlanetsUpdate(room);
 		//console.log(statuses);
 		playing.io.to(room.id).emit('update', statuses);
@@ -141,7 +135,7 @@ function getAllStatsFromPlanetsUpdate(room){
 		//Update all the classes with an update method and push all statuses in every object.
 		obj.update(room);
 		if(obj.status.planet){
-			console.log(obj.status.planet);
+			//console.log(obj.status.planet);
 			statuses.push(obj.status.planet);
 		}
 	}

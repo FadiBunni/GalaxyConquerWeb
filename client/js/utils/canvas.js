@@ -24,10 +24,48 @@ var Canvas = {
 	  return deviceRatio / backingRatio;
 	},
 
-	generateCanvas : function generateCanvas(w, h) {
-	  console.log('Generating canvas.');
+	generateCanvasStatic : function generateCanvas(w, h) {
+	  console.log('Generating canvasStatic.');
 
-	  var canvas = document.getElementById('canvas');
+	  var canvas = document.getElementById('canvasStatic');
+	  var ctx = canvas.getContext('2d');
+	  // Pass our canvas' context to our getPixelRatio method
+	  var ratio = this.getPixelRatio(ctx);
+
+	  // Set the canvas' width then downscale via CSS
+	  canvas.width = Math.round(w * ratio);
+	  canvas.height = Math.round(h * ratio);
+	  canvas.style.width = w +'px';
+	  canvas.style.height = h +'px';
+	  // Scale the context so we get accurate pixel density
+	  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+	  return canvas;
+	},
+
+	generateCanvasDynamic : function generateCanvas(w, h) {
+	  console.log('Generating canvasDynamic.');
+
+	  var canvas = document.getElementById('canvasDynamic');
+	  var ctx = canvas.getContext('2d');
+	  // Pass our canvas' context to our getPixelRatio method
+	  var ratio = this.getPixelRatio(ctx);
+
+	  // Set the canvas' width then downscale via CSS
+	  canvas.width = Math.round(w * ratio);
+	  canvas.height = Math.round(h * ratio);
+	  canvas.style.width = w +'px';
+	  canvas.style.height = h +'px';
+	  // Scale the context so we get accurate pixel density
+	  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+	  return canvas;
+	},
+
+	generateCanvasUI : function generateCanvas(w, h) {
+	  console.log('Generating canvasDynamic.');
+
+	  var canvas = document.getElementById('canvasUI');
 	  var ctx = canvas.getContext('2d');
 	  // Pass our canvas' context to our getPixelRatio method
 	  var ratio = this.getPixelRatio(ctx);

@@ -5,12 +5,16 @@ var Interval = 10;
 
 var socket = io();
 
-var ctx = canvas.getContext('2d');
+var ctxS = canvasStatic.getContext('2d');
+var ctxD = canvasDynamic.getContext('2d');
+var ctxU = canvasUI.getContext('2d');
 
 socket.on('connected', function(SERVER_GAME_SETTINGS){
 	GAME_SETTINGS = SERVER_GAME_SETTINGS;
-	const canvas = cUtils.generateCanvas(GAME_SETTINGS.WIDTH, GAME_SETTINGS.HEIGHT);
-	STATES.start.initialize(canvas,ctx,socket,GAME_SETTINGS);
+	const canvasStatic = cUtils.generateCanvasStatic(GAME_SETTINGS.WIDTH, GAME_SETTINGS.HEIGHT);
+	const canvasDynamic = cUtils.generateCanvasDynamic(GAME_SETTINGS.WIDTH, GAME_SETTINGS.HEIGHT);
+	const canvasUI = cUtils.generateCanvasUI(GAME_SETTINGS.WIDTH, GAME_SETTINGS.HEIGHT);
+	STATES.start.initialize(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
 });
 
 //Prints out the new user entered
@@ -24,7 +28,7 @@ socket.on('total user count updated', function(count){
 });
 
 socket.on('ready', function(){
-	STATES.ready.initialize(canvas,ctx,socket,GAME_SETTINGS);
+	STATES.ready.initialize(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
 });
 
 socket.on('init', function(statuses){
@@ -34,16 +38,17 @@ socket.on('init', function(statuses){
 
 socket.on('update', function(statuses){
 	STATES.setServerTimerMessage(statuses);
+	STATES.setServerObjects(statuses);
 	//console.log(statuses);
 });
 
 socket.on('playing', function(){
 	STATES.ready.destroy();
-	STATES.playing.initialize(canvas,ctx,socket,GAME_SETTINGS);
+	STATES.playing.initialize(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
 });
 
 socket.on('destroy', function(SERVER_MESSAGE){
 	STATES.ready.destroy();
 	STATES.playing.destroy();
-	STATES.backToOpeningScene.initialize(canvas,ctx,socket,GAME_SETTINGS,SERVER_MESSAGE);
+	STATES.backToOpeningScene.initialize(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS,SERVER_MESSAGE);
 });

@@ -1,21 +1,31 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-function drawObjects(ctx,status){
-  //console.log(status.role);
-  switch(status.role){
-    case "countdown":
-      //console.log('countdown');
-      drawText(ctx,status);
-      break;
-    case "grayzonePlanet":
-      //console.log('grayzonePlanet');
-      drawPlanets(ctx,status);
-      break;
-    case "playerPlanet":
-      //console.log('playerPlanet');
-      drawPlanets(ctx,status);
-      break;
+var drawObjects = {
+
+  drawPlanets:function(ctx,status){
+    console.log(status);
+    switch(status.role){
+      case "grayzonePlanet":
+        //console.log('grayzonePlanet');
+        drawPlanets(ctx,status);
+        break;
+      case "playerPlanet":
+        //console.log('playerPlanet');
+        drawPlanets(ctx,status);
+        break;
+    }
+  },
+
+  timer: function(ctx,status){
+    switch(status.role){
+      case "countdown":
+        //console.log('countdown');
+        drawText(ctx,status);
+        break;
+    }
   }
-}
+};
+
+module.exports = drawObjects;
 
 function drawPlanets(ctx, status){
   ctx.save();
@@ -25,19 +35,24 @@ function drawPlanets(ctx, status){
   ctx.arc(status.x,status.y,status.planetSize,0,2*Math.PI);
   ctx.stroke();
   ctx.fill();
+  drawTextOnPlanets(ctx,status);
+  ctx.restore();
+}
+
+function drawTextOnPlanets(ctx,status){
   ctx.textBaseline="middle";
   ctx.textAlign = 'center';
   ctx.fillStyle = "white";
   ctx.font = "16px verdana";
   ctx.fillText(status.planetScoreNumber,status.x,status.y);
-  ctx.restore();
 }
 
 function drawText(ctx, status){
   if(!status.color) return;
+  ctx.clearRect(status.x-19,status.y-17,40,33);
+  //var imagedata = ctx.getImageData(status.x-17,status.y-17,40,33);
   ctx.save();
   ctx.beginPath();
-
   ctx.font = status.size+"px "+status.font;
   ctx.textAlign = status.textAlign;
   ctx.textBaseline = status.textBaseline;
@@ -51,10 +66,14 @@ function drawText(ctx, status){
     ctx.fillStyle = status.color.fill;
     ctx.fillText(status.message, status.x, status.y);
   }
+  if(status.message == 0){
+    ctx.clearRect(status.x-19,status.y-17,40,33);
+  }
+  //ctx.putImageData(imagedata, status.x-100,status.y);
   ctx.restore();
 }
 
-module.exports = drawObjects;
+
 
 },{}],2:[function(require,module,exports){
 const cUtils = require('./utils/canvas.js');
@@ -64,12 +83,16 @@ var Interval = 10;
 
 var socket = io();
 
-var ctx = canvas.getContext('2d');
+var ctxS = canvasStatic.getContext('2d');
+var ctxD = canvasDynamic.getContext('2d');
+var ctxU = canvasUI.getContext('2d');
 
 socket.on('connected', function(SERVER_GAME_SETTINGS){
 	GAME_SETTINGS = SERVER_GAME_SETTINGS;
-	const canvas = cUtils.generateCanvas(GAME_SETTINGS.WIDTH, GAME_SETTINGS.HEIGHT);
-	STATES.start.initialize(canvas,ctx,socket,GAME_SETTINGS);
+	const canvasStatic = cUtils.generateCanvasStatic(GAME_SETTINGS.WIDTH, GAME_SETTINGS.HEIGHT);
+	const canvasDynamic = cUtils.generateCanvasDynamic(GAME_SETTINGS.WIDTH, GAME_SETTINGS.HEIGHT);
+	const canvasUI = cUtils.generateCanvasUI(GAME_SETTINGS.WIDTH, GAME_SETTINGS.HEIGHT);
+	STATES.start.initialize(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
 });
 
 //Prints out the new user entered
@@ -83,7 +106,7 @@ socket.on('total user count updated', function(count){
 });
 
 socket.on('ready', function(){
-	STATES.ready.initialize(canvas,ctx,socket,GAME_SETTINGS);
+	STATES.ready.initialize(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
 });
 
 socket.on('init', function(statuses){
@@ -93,25 +116,26 @@ socket.on('init', function(statuses){
 
 socket.on('update', function(statuses){
 	STATES.setServerTimerMessage(statuses);
+	STATES.setServerObjects(statuses);
 	//console.log(statuses);
 });
 
 socket.on('playing', function(){
 	STATES.ready.destroy();
-	STATES.playing.initialize(canvas,ctx,socket,GAME_SETTINGS);
+	STATES.playing.initialize(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
 });
 
 socket.on('destroy', function(SERVER_MESSAGE){
 	STATES.ready.destroy();
 	STATES.playing.destroy();
-	STATES.backToOpeningScene.initialize(canvas,ctx,socket,GAME_SETTINGS,SERVER_MESSAGE);
+	STATES.backToOpeningScene.initialize(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS,SERVER_MESSAGE);
 });
 },{"./utils/STATES.js":3,"./utils/canvas.js":5}],3:[function(require,module,exports){
 const Drawobjects = require('../entities/drawObjects.js');
 const Img    = require('./imgimport.js');
 const Button = require('./button.js');
 const Text   = require('./text.js');
-const INTERVAL = 45;
+const INTERVAL = 10;
 
 var params = [];
 var serverObjects = [];
@@ -122,11 +146,11 @@ var interval = setInterval(function(){
 },INTERVAL);
 
 var start = {
-  misc: function(canvas,ctx,socket,GAME_SETTINGS){
+  misc: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     var self = this;
     self.button1 = new Button();
     self.button1.click = function(){
-      start.toWait(canvas,ctx,socket,GAME_SETTINGS);
+      start.toWait(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
     };
     self.button1.update = function(){
       var text = this.data.text;
@@ -139,11 +163,12 @@ var start = {
     };
   },
 
-  initialize: function(canvas,ctx,socket,GAME_SETTINGS){
+  initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
-  	this.misc(canvas,ctx,socket,GAME_SETTINGS);
-    Img('spaceship',ctx);
-    start.button1.initialize(canvas,ctx,GAME_SETTINGS, {
+
+  	this.misc(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
+    Img('spaceship',ctxS);
+    start.button1.initialize(canvasUI,ctxU,GAME_SETTINGS, {
       text:{
         x: undefined,
         y: 310,
@@ -177,7 +202,7 @@ var start = {
         dir: 10,
       }
     });
-    params.push(canvas,ctx,socket,GAME_SETTINGS);
+    params.push(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
     mainLoop = start.loop;
   },
 
@@ -187,17 +212,17 @@ var start = {
   },
 
   destroy:function(){
-    $(canvas).off();
-    canvas.removeEventListener("touchstart", start.button1.events.touchstart);
-    canvas.removeEventListener("touchmove", start.button1.events.touchmove);
-    canvas.removeEventListener("touchend", start.button1.events.touchend);
+    $(canvasUI).off();
+    canvasUI.removeEventListener("touchstart", start.button1.events.touchstart);
+    canvasUI.removeEventListener("touchmove", start.button1.events.touchmove);
+    canvasUI.removeEventListener("touchend", start.button1.events.touchend);
   },
 
-  toWait: function(canvas,ctx,socket,GAME_SETTINGS){
+  toWait: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     start.destroy();
     socket.emit('waiting');
-    ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-    waiting.initialize(canvas,ctx,GAME_SETTINGS);
+    ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+    waiting.initialize(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
   }
 };
 
@@ -216,10 +241,9 @@ var waiting = {
     };
   },
 
-  initialize: function(canvas,ctx,GAME_SETTINGS){
+  initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     this.misc();
-    Img('spaceship',ctx);
-    waiting.text1.initialize(canvas,ctx,GAME_SETTINGS,{
+    waiting.text1.initialize(canvasUI,ctxU,GAME_SETTINGS,{
       text:{
         x: undefined,
         y: undefined,
@@ -253,20 +277,19 @@ var waiting = {
 };
 
 var ready = {
-  misc: function(socket,ctx,GAME_SETTINGS){
+  misc: function(socket,ctxU,GAME_SETTINGS){
     var self = this;
     self.text1 = new Text();
     self.button1 = new Button();
     self.button1.click = function(){
       //set player to be ready.
-      socket.emit('ready');
-      ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-      Img('spaceship',ctx,function(){
-        drawObjects(ctx,serverObjects);
-      });
+
+      ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
       ready.text1.data.text.message = "waiting for opponent to be ready";
       delete ready.button1.data;
       ready.destroy();
+      socket.emit('ready');
+
     };
     self.button1.update = function(){
       var text = this.data.text;
@@ -278,14 +301,10 @@ var ready = {
       text.globalAlpha = 0.5 + 0.5*(animation.count/1000);
     };
   },
-  initialize: function(canvas,ctx,socket,GAME_SETTINGS){
-    this.misc(socket,ctx,GAME_SETTINGS);
-    ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-    Img('spaceship',ctx,function(){
-      drawObjects(ctx,serverObjects);
-    });
-
-    ready.text1.initialize(canvas,ctx,GAME_SETTINGS,{
+  initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
+    this.misc(socket,ctxU,GAME_SETTINGS);
+    ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+    ready.text1.initialize(canvasUI,ctxU,GAME_SETTINGS,{
       text:{
         x: GAME_SETTINGS.WIDTH/2,
         y: undefined,
@@ -302,7 +321,7 @@ var ready = {
         }
       }
     });
-    ready.button1.initialize(canvas,ctx,GAME_SETTINGS,{
+    ready.button1.initialize(canvasUI,ctxU,GAME_SETTINGS,{
       rect: {
         x: GAME_SETTINGS.WIDTH/2,
         y: GAME_SETTINGS.HEIGHT/2+40,
@@ -346,18 +365,18 @@ var ready = {
       ready.button1.draw();
     }
     ready.text1.draw();
-
   },
 
   update: function(){
-    drawTimerMessage(params[1], serverObjects);
+    drawTimerMessage(params[5],serverObjects);
+    drawObjects(params[4],serverObjects);
   },
 
   destroy:function(){
-    $(canvas).off();
-    canvas.removeEventListener("touchstart", ready.button1.events.touchstart);
-    canvas.removeEventListener("touchmove", ready.button1.events.touchmove);
-    canvas.removeEventListener("touchend", ready.button1.events.touchend);
+    $(canvasUI).off();
+    canvasUI.removeEventListener("touchstart", ready.button1.events.touchstart);
+    canvasUI.removeEventListener("touchmove", ready.button1.events.touchmove);
+    canvasUI.removeEventListener("touchend", ready.button1.events.touchend);
   }
 };
 
@@ -366,11 +385,9 @@ var playing = {
 
   },
 
-  initialize: function(canvas,ctx,socket,GAME_SETTINGS){
-    this.misc(socket,ctx,GAME_SETTINGS);
-    ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-    Img('spaceship',ctx);
-
+  initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
+    this.misc(canvasStatic,canvasDynamic,ctxS,ctxD,socket,GAME_SETTINGS);
+    ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
 
 
 
@@ -378,11 +395,11 @@ var playing = {
   },
 
   loop: function(){
-    ready.update();
+    playing.update();
   },
 
   update: function(){
-    //drawObjects(params[1],serverObjects);
+    drawObjects(params[4],serverObjects);
   },
 
   destroy:function(){
@@ -413,11 +430,13 @@ var backToOpeningScene = {
     }
   },
 
-  initialize: function(canvas,ctx,socket,GAME_SETTINGS,SERVER_MESSAGE){
+  initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS,SERVER_MESSAGE){
     this.misc();
-    ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+    ctxS.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+    ctxD.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+    ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
     backToOpeningScene.count = 0;
-    backToOpeningScene.text1.initialize(canvas,ctx,GAME_SETTINGS,{
+    backToOpeningScene.text1.initialize(canvasUI,ctxU,GAME_SETTINGS,{
       text:{
         x: undefined,
         y: GAME_SETTINGS.HEIGHT/2-20,
@@ -436,7 +455,7 @@ var backToOpeningScene = {
         count: 0,
       }
     });
-    backToOpeningScene.text2.initialize(canvas,ctx,GAME_SETTINGS,{
+    backToOpeningScene.text2.initialize(canvasUI,ctxU,GAME_SETTINGS,{
       text:{
         x: undefined,
         y: GAME_SETTINGS.HEIGHT/2+20,
@@ -468,8 +487,9 @@ var backToOpeningScene = {
   update: function(){
     backToOpeningScene.count++;
     if(backToOpeningScene.count >= 500){
-      params[1].clearRect(0,0,params[3].WIDTH,params[3].HEIGHT);
-      start.initialize(params[0],params[1],params[2],params[3])
+      params[3].clearRect(0,0,params[7].WIDTH,params[7].HEIGHT);
+      params[5].clearRect(0,0,params[7].WIDTH,params[7].HEIGHT);
+      start.initialize(params[0],params[1],params[2],params[3],params[4],params[5],params[6],params[7]);
     }
   },
 
@@ -482,7 +502,7 @@ function drawObjects(ctx,serverObjects){
   this.serverObjects = serverObjects;
   for(objects in serverObjects){
     obj = serverObjects[objects];
-    Drawobjects(ctx,obj);
+    Drawobjects.drawPlanets(ctx,obj);
   }
   //console.log(obj);
 }
@@ -491,12 +511,13 @@ function drawTimerMessage(ctx, serverObjects){
   this.serverObjects = serverObjects;
   for(objects in serverObjects){
     obj = serverObjects[objects];
-    Drawobjects(ctx,obj);
+    Drawobjects.timer(ctx,obj);
   }
   //console.log(obj);
 }
 
 function setServerObjects(statuses){
+  serverObjects = [];
   this.statuses = statuses;
   for(status in statuses){
     stat = statuses[status];
@@ -654,10 +675,48 @@ var Canvas = {
 	  return deviceRatio / backingRatio;
 	},
 
-	generateCanvas : function generateCanvas(w, h) {
-	  console.log('Generating canvas.');
+	generateCanvasStatic : function generateCanvas(w, h) {
+	  console.log('Generating canvasStatic.');
 
-	  var canvas = document.getElementById('canvas');
+	  var canvas = document.getElementById('canvasStatic');
+	  var ctx = canvas.getContext('2d');
+	  // Pass our canvas' context to our getPixelRatio method
+	  var ratio = this.getPixelRatio(ctx);
+
+	  // Set the canvas' width then downscale via CSS
+	  canvas.width = Math.round(w * ratio);
+	  canvas.height = Math.round(h * ratio);
+	  canvas.style.width = w +'px';
+	  canvas.style.height = h +'px';
+	  // Scale the context so we get accurate pixel density
+	  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+	  return canvas;
+	},
+
+	generateCanvasDynamic : function generateCanvas(w, h) {
+	  console.log('Generating canvasDynamic.');
+
+	  var canvas = document.getElementById('canvasDynamic');
+	  var ctx = canvas.getContext('2d');
+	  // Pass our canvas' context to our getPixelRatio method
+	  var ratio = this.getPixelRatio(ctx);
+
+	  // Set the canvas' width then downscale via CSS
+	  canvas.width = Math.round(w * ratio);
+	  canvas.height = Math.round(h * ratio);
+	  canvas.style.width = w +'px';
+	  canvas.style.height = h +'px';
+	  // Scale the context so we get accurate pixel density
+	  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+	  return canvas;
+	},
+
+	generateCanvasUI : function generateCanvas(w, h) {
+	  console.log('Generating canvasDynamic.');
+
+	  var canvas = document.getElementById('canvasUI');
 	  var ctx = canvas.getContext('2d');
 	  // Pass our canvas' context to our getPixelRatio method
 	  var ratio = this.getPixelRatio(ctx);
