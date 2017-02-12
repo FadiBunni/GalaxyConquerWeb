@@ -30,8 +30,11 @@ function playerPlanets(id,playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 		y:yPos
 	};
 
-	this.update = function(room){
-		this.status.planet.planetScoreNumber++;
+	this.update = function(room,createdAt){
+		var counter = Math.floor((Date.now()-createdAt)/1000);
+		console.log(createdAt);
+		this.status.planet.planetScoreNumber = planetScoreNumber;
+		this.status.planet.planetScoreNumber += counter;
 	};
 }
 

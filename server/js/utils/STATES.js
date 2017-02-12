@@ -1,15 +1,19 @@
 const Countdown = require('./countdown.js');
 const SETTINGS = require('./SETTINGS.js');
-
+var statuses = [];
+var isSet = false;
+var createdAt;
 var ready = {
 	initialize: function(io,room){
 		this.io = io;
 		room.status = "ready";
 		//Set the loop in the room "class" equal to the loop in ready object
 		//Add countdown to the room.object array and instantiate a new one
+		
 		var statuses = getAllStatsFromPlanets(room);
-		//console.log(statuses);
+		console.log(statuses);
 		io.to(room.id).emit('init', statuses);
+
 		room.objects.countdown = new Countdown(30,null,SETTINGS.HEIGHT/2-100,null,true);
     	room.objects.countdown.action = function(room){
     		/*Destroy can be called because RmMg is inside the room contructor.
@@ -23,8 +27,6 @@ var ready = {
 	loop: function(room){
 		var player0ready = room.objects[room.players[0].id].ready;
 		var player1ready = room.objects[room.players[1].id].ready;
-
-
 		// if both players is ready, destroy the room, and initialize the game(playing)
 		if(player0ready && player1ready) {
 			playing.initialize(ready.io,room);
@@ -62,14 +64,20 @@ var playing = {
 			var statuses = getCountdownMessage(room);
 			if(statuses[0].message <= 0){
 				playing.io.to(room.id).emit('playing');
+				isSet = true;
 				playing.room.loop = playing.loop;
+
 			}
 			playing.io.to(room.id).emit('update', statuses);
 		}
 	},
 
 	loop: function(room){
-		var statuses = getAllStatsFromPlanetsUpdate(room);
+		if(isSet){
+			createdAt = Date.now();
+			isSet = false;
+		}
+		var statuses = getAllStatsFromPlanetsUpdate(room,createdAt);
 		//console.log(statuses);
 		playing.io.to(room.id).emit('update', statuses);
 
@@ -94,7 +102,7 @@ module.exports = {ready,playing};
 
 //the problem with this function is that is sends all the same data again, even though the grayzoneplanets does not move.
 function getAllStatsFromPlanets(room){
-	var statuses = [];
+	statuses = [];
 	//Object is all the objects in the object array in room "class".
 	for(var object in room.objects){
 		//console.log("object: " + object);
@@ -109,23 +117,25 @@ function getAllStatsFromPlanets(room){
 }
 
 function getCountdownMessage(room){
-	var statuses = [];
+	statuses = [];
 
 	//Object is all the objects in the object array in room "class".
 	for(object in room.objects){
 		var obj = room.objects[object];
-		obj.update(room);
 		if(obj.status.count){
-			//console.log(obj.status.count);
-			statuses.push(obj.status.count);
+			if(room.objects.countdown){
+				room.objects.countdown.update(room);
+				//console.log(obj.status.count);
+				statuses.push(obj.status.count);
+			}
 		}
 	}
 	// //console.log(statuses);
 	return statuses;
 }
 
-function getAllStatsFromPlanetsUpdate(room){
-	var statuses = [];
+function getAllStatsFromPlanetsUpdate(room,createdAt){
+	statuses = [];
 	//Object is all the objects in the object array in room "class".
 	for(var object in room.objects){
 		//console.log("object: " + object);
@@ -133,7 +143,7 @@ function getAllStatsFromPlanetsUpdate(room){
 		var obj = room.objects[object];
 		//console.log("obj: " + obj.status);
 		//Update all the classes with an update method and push all statuses in every object.
-		obj.update(room);
+		obj.update(room,createdAt);
 		if(obj.status.planet){
 			//console.log(obj.status.planet);
 			statuses.push(obj.status.planet);

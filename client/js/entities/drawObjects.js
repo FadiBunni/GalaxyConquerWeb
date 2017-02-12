@@ -1,7 +1,7 @@
 var drawObjects = {
 
   drawPlanets:function(ctx,status){
-    console.log(status);
+    //console.log(status);
     switch(status.role){
       case "grayzonePlanet":
         //console.log('grayzonePlanet');

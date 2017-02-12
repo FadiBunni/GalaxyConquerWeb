@@ -150,7 +150,8 @@ var ready = {
     self.button1.click = function(){
       //set player to be ready.
       ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-      //drawTimerMessage(ctxU,serverObjects);
+      
+      drawTimerMessage(ctxU,serverObjects);
       drawObjects(ctxD,serverObjects);
       ready.text1.data.text.message = "The game will start when your apponent is ready";
       delete ready.button1.data;
@@ -170,6 +171,7 @@ var ready = {
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     this.misc(socket,ctxD,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+    drawObjects(ctxD,serverObjects);
 
     ready.text1.initialize(canvasUI,ctxU,GAME_SETTINGS,{
       text:{
@@ -236,7 +238,7 @@ var ready = {
 
   update: function(){
     drawTimerMessage(params[5],serverObjects);
-    drawObjects(params[4],serverObjects);
+    //drawObjects(params[4],serverObjects);
   },
 
   destroy:function(){
@@ -371,7 +373,7 @@ function drawObjects(ctx,serverObjects){
     obj = serverObjects[objects];
     Drawobjects.drawPlanets(ctx,obj);
   }
-  //console.log(obj);
+  console.log(obj);
 }
 
 function drawTimerMessage(ctx, serverObjects){
@@ -380,15 +382,17 @@ function drawTimerMessage(ctx, serverObjects){
     obj = serverObjects[objects];
     Drawobjects.timer(ctx,obj);
   }
-  //console.log(obj);
+  console.log(serverObjects);
 }
 
 function setServerObjects(statuses){
-  serverObjects = [];
+  //serverObjects = [];
   this.statuses = statuses;
   for(status in statuses){
     stat = statuses[status];
-    serverObjects.push(stat)
+    if(stat.role === "grayzonePlanet" || stat.role === "playerPlanet"){
+      serverObjects.push(stat)
+    }
   }
   //console.log(serverObjects);
 }
@@ -398,7 +402,9 @@ function setServerTimerMessage(statuses){
   this.statuses = statuses;
   for(status in statuses){
     stat = statuses[status];
-    serverObjects.push(stat)
+    if(stat.role === "countdown"){
+      serverObjects.push(stat)
+    }
   };
   //console.log(serverObjects);
 }

@@ -29,7 +29,6 @@ function Countdown(count,xPos,yPos,size,setColorDir){
     } else {
       this.status.count.size *= 0.997;
     }
-
     if(this.setColorDir == true){
       if(count <=3){
        this.status.count.color.fill = "#FF0000";
@@ -41,9 +40,6 @@ function Countdown(count,xPos,yPos,size,setColorDir){
         this.status.count.color.fill = "#FF0000";
       }
     }
-
-
-
     if(count<0){
       this.action(room);
     }
