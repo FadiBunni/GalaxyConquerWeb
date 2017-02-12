@@ -32,6 +32,7 @@ var start = {
 
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
+
   	this.misc(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
     Img('spaceship',ctxS);
     start.button1.initialize(canvasUI,ctxU,GAME_SETTINGS, {
@@ -143,20 +144,24 @@ var waiting = {
 };
 
 var ready = {
-  misc: function(socket,ctxD,ctxU,GAME_SETTINGS){
+  misc: function(socket,ctxU,GAME_SETTINGS){
     var self = this;
     self.text1 = new Text();
     self.button1 = new Button();
     self.button1.click = function(){
       //set player to be ready.
+
       ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+<<<<<<< HEAD
       
       drawTimerMessage(ctxU,serverObjects);
       drawObjects(ctxD,serverObjects);
+=======
       ready.text1.data.text.message = "The game will start when your apponent is ready";
       delete ready.button1.data;
       ready.destroy();
       socket.emit('ready');
+
     };
     self.button1.update = function(){
       var text = this.data.text;
@@ -169,10 +174,12 @@ var ready = {
     };
   },
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
-    this.misc(socket,ctxD,ctxU,GAME_SETTINGS);
+    this.misc(socket,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+<<<<<<< HEAD
     drawObjects(ctxD,serverObjects);
 
+=======
     ready.text1.initialize(canvasUI,ctxU,GAME_SETTINGS,{
       text:{
         x: GAME_SETTINGS.WIDTH/2,
@@ -237,6 +244,7 @@ var ready = {
   },
 
   update: function(){
+    console.log(serverObjects);
     drawTimerMessage(params[5],serverObjects);
     //drawObjects(params[4],serverObjects);
   },
@@ -382,7 +390,9 @@ function drawTimerMessage(ctx, serverObjects){
     obj = serverObjects[objects];
     Drawobjects.timer(ctx,obj);
   }
+<<<<<<< HEAD
   console.log(serverObjects);
+=======
 }
 
 function setServerObjects(statuses){
@@ -391,8 +401,10 @@ function setServerObjects(statuses){
   for(status in statuses){
     stat = statuses[status];
     if(stat.role === "grayzonePlanet" || stat.role === "playerPlanet"){
+<<<<<<< HEAD
       serverObjects.push(stat)
     }
+=======
   }
   //console.log(serverObjects);
 }
@@ -403,6 +415,8 @@ function setServerTimerMessage(statuses){
   for(status in statuses){
     stat = statuses[status];
     if(stat.role === "countdown"){
+<<<<<<< HEAD
+=======
       serverObjects.push(stat)
     }
   };

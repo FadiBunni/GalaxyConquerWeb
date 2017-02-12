@@ -1,4 +1,6 @@
+<<<<<<< HEAD
 const INTERVAL = 1000/60;
+=======
 
 function GameManager(io, roomManager){
   var GmMg = this;
