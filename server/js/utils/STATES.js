@@ -13,7 +13,7 @@ var ready = {
 		var statuses = getAllStatsFromPlanets(room);
 		//console.log(statuses);
 		io.to(room.id).emit('init', statuses);
-		room.objects.countdown = new Countdown(30,null,SETTINGS.HEIGHT/2-100,null,true);
+		room.objects.countdown = new Countdown(10,null,SETTINGS.HEIGHT-40);
     	room.objects.countdown.action = function(room){
    //  		Destroy can be called because RmMg is inside the room contructor.
 			// Calling the destroy function in RmMg not in this 'ready' variable
@@ -47,7 +47,7 @@ var playing = {
 		room.status = "countdown";
 		//Set the loop in the room "class" equal to the loop in ready object
 
-		room.objects.countdown = new Countdown(5,null,SETTINGS.HEIGHT/2-100,null,false);
+		room.objects.countdown = new Countdown(3,null,SETTINGS.HEIGHT/2+40);
     	room.objects.countdown.action = function(room){
       		delete room.objects.countdown;
       		room.status = "playing";
