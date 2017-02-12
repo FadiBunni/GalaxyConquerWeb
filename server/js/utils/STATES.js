@@ -52,7 +52,7 @@ var playing = {
 		room.status = "countdown";
 		//Set the loop in the room "class" equal to the loop in ready object
 
-		room.objects.countdown = new Countdown(3,null,SETTINGS.HEIGHT/2+40);
+		room.objects.countdown = new Countdown(30,null,SETTINGS.HEIGHT/2-100,null,true);
     	room.objects.countdown.action = function(room){
       		delete room.objects.countdown;
       		room.status = "playing";

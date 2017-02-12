@@ -1,7 +1,7 @@
 const SETTINGS = require("./SETTINGS.js");
 const Baseobject = require("./baseobject.js");
 
-function Countdown(count,xPos,yPos,size){
+function Countdown(count,xPos,yPos,size,setColorDir){
   Baseobject.call(this);
   this.defaultCount = count?count:10;
   this.defaultSize = size?size:40;
@@ -9,7 +9,7 @@ function Countdown(count,xPos,yPos,size){
   this.role = "countdown";
   this.status.count = {
     role:this.role,
-    color : {fill:"#123456",stroke: undefined},
+    color : {fill:"#008000",stroke: undefined},
     font : "Arial",
     lineWidth : 10,
     textAlign : "center",
@@ -41,7 +41,6 @@ function Countdown(count,xPos,yPos,size){
       }
     }
 =======
->>>>>>> origin/master
     if(count<0){
       this.action(room);
     }
