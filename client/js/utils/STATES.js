@@ -150,7 +150,6 @@ var ready = {
     self.button1.click = function(){
       //set player to be ready.
       ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-      //drawTimerMessage(ctxU,serverObjects);
       drawObjects(ctxD,serverObjects);
       ready.text1.data.text.message = "The game will start when your apponent is ready";
       delete ready.button1.data;
@@ -235,6 +234,7 @@ var ready = {
   },
 
   update: function(){
+    console.log(serverObjects);
     drawTimerMessage(params[5],serverObjects);
     drawObjects(params[4],serverObjects);
   },
@@ -380,7 +380,7 @@ function drawTimerMessage(ctx, serverObjects){
     obj = serverObjects[objects];
     Drawobjects.timer(ctx,obj);
   }
-  //console.log(obj);
+  //console.log(serverObjects);
 }
 
 function setServerObjects(statuses){
@@ -388,7 +388,11 @@ function setServerObjects(statuses){
   this.statuses = statuses;
   for(status in statuses){
     stat = statuses[status];
-    serverObjects.push(stat)
+    if(stat.role === "grayzonePlanet" || stat.role === "playerPlanet"){
+      //console.log(stat);
+      serverObjects.push(stat)
+    }
+
   }
   //console.log(serverObjects);
 }
@@ -398,7 +402,10 @@ function setServerTimerMessage(statuses){
   this.statuses = statuses;
   for(status in statuses){
     stat = statuses[status];
-    serverObjects.push(stat)
+    if(stat.role === "countdown"){
+      //console.log(stat);
+      serverObjects.push(stat)
+    }
   };
   //console.log(serverObjects);
 }

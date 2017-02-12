@@ -4,6 +4,7 @@ const Baseobject = require("../utils/baseobject.js");
 function playerPlanets(id,playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 	Baseobject.call(this);
 	this.id = id;
+	this.createdAt = Date.now();
 	this.side = side;
 	this.xPos = xPos;
 	this.yPos = yPos;
@@ -31,7 +32,10 @@ function playerPlanets(id,playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 	};
 
 	this.update = function(room){
-		this.status.planet.planetScoreNumber++;
+		var counter = Math.floor((Date.now()-this.createdAt)/1000);
+		//console.log(counter);
+		this.status.planet.planetScoreNumber = planetScoreNumber;
+		this.status.planet.planetScoreNumber += counter;
 	};
 }
 

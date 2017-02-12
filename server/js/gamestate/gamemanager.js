@@ -1,4 +1,4 @@
-const INTERVAL = 1000;
+const INTERVAL = 10;
 
 function GameManager(io, roomManager){
   var GmMg = this;
