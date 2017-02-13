@@ -1,12 +1,10 @@
 const Text = new (require('./text.js'));
 
-function Button(canvas,ctx,GAME_SETTINGS,data) {
-
-	this.events = {};
+function Button() {
 
 	this.initialize = function(canvas, ctx, GAME_SETTINGS, data){
     //Text.initialize.call(this, canvas, ctx, GAME_SETTINGS, data);
-    Text.initialize.call(this,canvas, ctx, GAME_SETTINGS, data);
+    Text.initialize.call(this, canvas, ctx, GAME_SETTINGS, data);
     var rect = this.data.rect;
     var text = this.data.text;
     rect.x = rect.x?rect.x:text.x?text.x:GAME_SETTINGS.WIDTH/2;
@@ -18,7 +16,7 @@ function Button(canvas,ctx,GAME_SETTINGS,data) {
   };
 
 	this.setEvents = function(canvas){
-    //This is declared as a n global obtject, try to add 'var' later. 
+    //This is declared as an global object, try to add 'var' later.
     buttonObject = this;
     $(canvas).on('click', function(e){
       if(buttonObject.data){
@@ -34,28 +32,6 @@ function Button(canvas,ctx,GAME_SETTINGS,data) {
       buttonObject.mousemove(e);
     });
 
-    canvas.addEventListener("touchstart",this.events.touchstart);
-    canvas.addEventListener("touchmove",this.events.touchmove);
-    canvas.addEventListener("touchend",this.events.touchend);
-  };
-
-	this.events.touchstart = function(e){
-    e.preventDefault();
-    buttonObject.mousemove(e);
-
-  };
-
-	this.events.touchmove  = function(e){
-    buttonObject.mousemove(e);
-  };
-
-	this.events.touchend   = function(e){
-    var x = e.changedTouches[0].clientX-e.changedTouches[0].target.offsetLeft;
-    var y = e.changedTouches[0].clientY-e.changedTouches[0].target.offsetTop;
-    var rect = buttonObject.data.rect;
-    if(pointSquareCollisionCheck(x,y,rect)){
-      buttonObject.click();
-    }
   };
 
   this.mousemove = function(e){

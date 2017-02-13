@@ -1,7 +1,8 @@
 const Drawobjects = require('../entities/drawObjects.js');
 const Img    = require('./imgimport.js');
-const Button = require('./button.js');
-const Text   = require('./text.js');
+const Button = require('../objects/button.js');
+const Text   = require('../objects/text.js');
+const Dynamicrect = require('../objects/dynamicrect.js');
 const INTERVAL = 10;
 
 var params = [];
@@ -79,10 +80,6 @@ var start = {
   },
 
   destroy:function(){
-    $(canvasUI).off();
-    canvasUI.removeEventListener("touchstart", start.button1.events.touchstart);
-    canvasUI.removeEventListener("touchmove", start.button1.events.touchmove);
-    canvasUI.removeEventListener("touchend", start.button1.events.touchend);
   },
 
   toWait: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
@@ -144,19 +141,14 @@ var waiting = {
 };
 
 var ready = {
-  misc: function(socket,ctxU,GAME_SETTINGS){
+  misc: function(socket,ctxD,ctxU,GAME_SETTINGS){
     var self = this;
     self.text1 = new Text();
     self.button1 = new Button();
     self.button1.click = function(){
       //set player to be ready.
-
       ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-<<<<<<< HEAD
-      
-      drawTimerMessage(ctxU,serverObjects);
       drawObjects(ctxD,serverObjects);
-=======
       ready.text1.data.text.message = "The game will start when your apponent is ready";
       delete ready.button1.data;
       ready.destroy();
@@ -174,12 +166,10 @@ var ready = {
     };
   },
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
-    this.misc(socket,ctxU,GAME_SETTINGS);
+    this.misc(socket,ctxD,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-<<<<<<< HEAD
-    drawObjects(ctxD,serverObjects);
 
-=======
+    drawObjects(ctxD,serverObjects);
     ready.text1.initialize(canvasUI,ctxU,GAME_SETTINGS,{
       text:{
         x: GAME_SETTINGS.WIDTH/2,
@@ -244,28 +234,27 @@ var ready = {
   },
 
   update: function(){
-    console.log(serverObjects);
+    //console.log(serverObjects);
     drawTimerMessage(params[5],serverObjects);
-    //drawObjects(params[4],serverObjects);
   },
 
   destroy:function(){
-    $(canvasUI).off();
-    canvasUI.removeEventListener("touchstart", ready.button1.events.touchstart);
-    canvasUI.removeEventListener("touchmove", ready.button1.events.touchmove);
-    canvasUI.removeEventListener("touchend", ready.button1.events.touchend);
   }
 };
 
 var playing = {
-  misc: function(){
+  misc: function(canvasDynamic,ctxD,GAME_SETTINGS){
+    var self = this;
+    self.dynamicrect1 = new Dynamicrect();
+    // self.dynamicrect1.update = function(){
 
+    // }
   },
 
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
-    this.misc(canvasStatic,canvasDynamic,ctxS,ctxD,socket,GAME_SETTINGS);
+    this.misc(canvasDynamic,ctxD,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-
+    playing.dynamicrect1.initialize(canvasDynamic,ctxD,GAME_SETTINGS);
 
 
     mainLoop = playing.loop;
@@ -276,6 +265,7 @@ var playing = {
   },
 
   update: function(){
+    playing.dynamicrect1.draw();
     drawObjects(params[4],serverObjects);
   },
 
@@ -381,7 +371,7 @@ function drawObjects(ctx,serverObjects){
     obj = serverObjects[objects];
     Drawobjects.drawPlanets(ctx,obj);
   }
-  console.log(obj);
+  //console.log(obj);
 }
 
 function drawTimerMessage(ctx, serverObjects){
@@ -390,9 +380,7 @@ function drawTimerMessage(ctx, serverObjects){
     obj = serverObjects[objects];
     Drawobjects.timer(ctx,obj);
   }
-<<<<<<< HEAD
-  console.log(serverObjects);
-=======
+  //console.log(serverObjects);
 }
 
 function setServerObjects(statuses){
@@ -401,10 +389,8 @@ function setServerObjects(statuses){
   for(status in statuses){
     stat = statuses[status];
     if(stat.role === "grayzonePlanet" || stat.role === "playerPlanet"){
-<<<<<<< HEAD
       serverObjects.push(stat)
     }
-=======
   }
   //console.log(serverObjects);
 }
@@ -415,8 +401,6 @@ function setServerTimerMessage(statuses){
   for(status in statuses){
     stat = statuses[status];
     if(stat.role === "countdown"){
-<<<<<<< HEAD
-=======
       serverObjects.push(stat)
     }
   };

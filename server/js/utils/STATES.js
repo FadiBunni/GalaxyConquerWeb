@@ -1,24 +1,22 @@
 const Countdown = require('./countdown.js');
 const SETTINGS = require('./SETTINGS.js');
-<<<<<<< HEAD
+
 var statuses = [];
 var isSet = false;
 var createdAt;
-=======
+
 var ready = {
 	initialize: function(io,room){
 		this.io = io;
 		room.status = "ready";
 		//Set the loop in the room "class" equal to the loop in ready object
 		//Add countdown to the room.object array and instantiate a new one
-		
+
 		var statuses = getAllStatsFromPlanets(room);
-		console.log(statuses);
+		//console.log(statuses);
 		io.to(room.id).emit('init', statuses);
-<<<<<<< HEAD
 
 		room.objects.countdown = new Countdown(30,null,SETTINGS.HEIGHT/2-100,null,true);
-=======
     	room.objects.countdown.action = function(room){
    //  		Destroy can be called because RmMg is inside the room contructor.
 			// Calling the destroy function in RmMg not in this 'ready' variable
@@ -52,7 +50,7 @@ var playing = {
 		room.status = "countdown";
 		//Set the loop in the room "class" equal to the loop in ready object
 
-		room.objects.countdown = new Countdown(30,null,SETTINGS.HEIGHT/2-100,null,true);
+		room.objects.countdown = new Countdown(1,null,SETTINGS.HEIGHT/2-100,null,true);
     	room.objects.countdown.action = function(room){
       		delete room.objects.countdown;
       		room.status = "playing";
@@ -120,8 +118,6 @@ function getAllStatsFromPlanets(room){
 
 function getCountdownMessage(room){
 	statuses = [];
-<<<<<<< HEAD
-
 	//Object is all the objects in the object array in room "class".
 	for(object in room.objects){
 		var obj = room.objects[object];
@@ -130,7 +126,6 @@ function getCountdownMessage(room){
 				room.objects.countdown.update(room);
 				//console.log(obj.status.count);
 				statuses.push(obj.status.count);
-=======
 			}
 		}
 	}
@@ -138,9 +133,7 @@ function getCountdownMessage(room){
 	return statuses;
 }
 
-<<<<<<< HEAD
 function getAllStatsFromPlanetsUpdate(room,createdAt){
-=======
 	statuses = [];
 	//Object is all the objects in the object array in room "class".
 	for(var object in room.objects){
