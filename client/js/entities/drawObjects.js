@@ -32,7 +32,6 @@ function drawPlanets(ctx, status){
   ctx.globalAlpha = 0.85;
   ctx.beginPath();
   ctx.arc(status.x,status.y,status.planetSize,0,2*Math.PI);
-  ctx.stroke();
   ctx.fill();
   drawTextOnPlanets(ctx,status);
   ctx.restore();

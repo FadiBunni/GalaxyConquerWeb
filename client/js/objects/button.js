@@ -18,6 +18,7 @@ function Button() {
 	this.setEvents = function(canvas){
     //This is declared as an global object, try to add 'var' later.
     buttonObject = this;
+    //console.log(buttonObject);
     $(canvas).on('click', function(e){
       if(buttonObject.data){
         //console.log('clicked');
@@ -40,6 +41,7 @@ function Button() {
       if(e.type == 'mousemove'){
         x = e.offsetX;
         y = e.offsetY;
+        //console.log("buttonX: " + x);
       } else {
         x = e.changedTouches[0].clientX-e.changedTouches[0].target.offsetLeft;
         y = e.changedTouches[0].clientY-e.changedTouches[0].target.offsetTop;

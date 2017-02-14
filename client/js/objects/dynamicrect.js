@@ -1,18 +1,17 @@
-function Dynamicrect(){
+function Dynamicrect(canvas,ctx,GAME_SETTINGS){
+	this.canvas = canvas;
+	this.ctx = ctx;
+	this.GAME_SETTINGS = GAME_SETTINGS;
 	var rect = {};
 	var drag = false;
 
-	this.initialize = function(canvas,ctx,GAME_SETTINGS){
-		this.canvas = canvas;
-		this.ctx = ctx;
-		this.GAME_SETTINGS = GAME_SETTINGS;
-
+	this.initialize = function(){
 		if(this.setEvents){
-	      this.setEvents(canvas);
+	      this.setEvents();
 	    }
 	};
 
-	this.setEvents = function(canvas){
+	this.setEvents = function(){
 		rectObject = this;
 
 		$(canvas).on('mousedown',function(e){
@@ -29,33 +28,36 @@ function Dynamicrect(){
 	};
 
 	this.mouseDown = function(e){
-		rect.startX = e.pageX - this.offsetLeft;
-		rect.startY = e.pageY - this.offsetTop;
-		console.log("rect_startX: " + rect.startX);
-		console.log("rect_startY: " + rect.startY);
+		rect.w = null;
+		rect.h = null;
+		if(e.type == 'mousedown'){
+		rect.startX = e.offsetX;
+		rect.startY = e.offsetY;
+		// console.log("rect_startX: " + rect.startX);
+		// console.log("rect_startY: " + rect.startY);
+		}
 		drag = true;
 	};
 
 	this.mouseMove = function(e){
-		if(e.type == 'mousemove'){
-			var x = e.offsetX;
-       		var y = e.offsetY;
-       		console.log(x);
+		if(drag && e.type == 'mousemove'){
+			rect.w = e.offsetX - rect.startX;
+			rect.h = e.offsetY - rect.startY;
+			// console.log("rectdragW: "+ rect.w)
+			// console.log("rectdragH: "+ rect.h)
+			ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+			this.draw();
 		}
-		// if(drag){
-		// 	rect.w = (e.pageX - this.offsetLeft) - rect.startX;
-		// 	rect.h = (e.pageY - this.offsetTop) - rect.startY;
-		// 	this.ctx = clearRect(0,0,this.GAME_SETTINGS.WIDTH,this.GAME_SETTINGS.HEIGHT);
-		// }
 	};
 
-	this.mouseUp = function(e){
+	this.mouseUp = function(){
+		ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
 		drag = false;
-		this.ctx = clearRect(0,0,this.GAME_SETTINGS.WIDTH,this.GAME_SETTINGS.HEIGHT);
 	};
 
 	this.draw = function(){
-		this.ctx.strokeRect(rect.startX, rect.startY, rect.w, rect.h);
+		ctx.strokeStyle = '#000000';
+		ctx.strokeRect(rect.startX, rect.startY, rect.w, rect.h);
 	};
 }
 

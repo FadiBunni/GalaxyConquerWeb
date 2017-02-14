@@ -33,7 +33,6 @@ function drawPlanets(ctx, status){
   ctx.globalAlpha = 0.85;
   ctx.beginPath();
   ctx.arc(status.x,status.y,status.planetSize,0,2*Math.PI);
-  ctx.stroke();
   ctx.fill();
   drawTextOnPlanets(ctx,status);
   ctx.restore();
@@ -146,6 +145,7 @@ function Button() {
 	this.setEvents = function(canvas){
     //This is declared as an global object, try to add 'var' later.
     buttonObject = this;
+    //console.log(buttonObject);
     $(canvas).on('click', function(e){
       if(buttonObject.data){
         //console.log('clicked');
@@ -168,6 +168,7 @@ function Button() {
       if(e.type == 'mousemove'){
         x = e.offsetX;
         y = e.offsetY;
+        //console.log("buttonX: " + x);
       } else {
         x = e.changedTouches[0].clientX-e.changedTouches[0].target.offsetLeft;
         y = e.changedTouches[0].clientY-e.changedTouches[0].target.offsetTop;
@@ -215,21 +216,20 @@ function drawRect(ctx, rect){
   ctx.restore();
 }
 },{"./text.js":5}],4:[function(require,module,exports){
-function Dynamicrect(){
+function Dynamicrect(canvas,ctx,GAME_SETTINGS){
+	this.canvas = canvas;
+	this.ctx = ctx;
+	this.GAME_SETTINGS = GAME_SETTINGS;
 	var rect = {};
 	var drag = false;
 
-	this.initialize = function(canvas,ctx,GAME_SETTINGS){
-		this.canvas = canvas;
-		this.ctx = ctx;
-		this.GAME_SETTINGS = GAME_SETTINGS;
-
+	this.initialize = function(){
 		if(this.setEvents){
-	      this.setEvents(canvas);
+	      this.setEvents();
 	    }
 	};
 
-	this.setEvents = function(canvas){
+	this.setEvents = function(){
 		rectObject = this;
 
 		$(canvas).on('mousedown',function(e){
@@ -246,33 +246,36 @@ function Dynamicrect(){
 	};
 
 	this.mouseDown = function(e){
-		rect.startX = e.pageX - this.offsetLeft;
-		rect.startY = e.pageY - this.offsetTop;
-		console.log("rect_startX: " + rect.startX);
-		console.log("rect_startY: " + rect.startY);
+		rect.w = null;
+		rect.h = null;
+		if(e.type == 'mousedown'){
+		rect.startX = e.offsetX;
+		rect.startY = e.offsetY;
+		// console.log("rect_startX: " + rect.startX);
+		// console.log("rect_startY: " + rect.startY);
+		}
 		drag = true;
 	};
 
 	this.mouseMove = function(e){
-		if(e.type == 'mousemove'){
-			var x = e.offsetX;
-       		var y = e.offsetY;
-       		console.log(x);
+		if(drag && e.type == 'mousemove'){
+			rect.w = e.offsetX - rect.startX;
+			rect.h = e.offsetY - rect.startY;
+			// console.log("rectdragW: "+ rect.w)
+			// console.log("rectdragH: "+ rect.h)
+			ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+			this.draw();
 		}
-		// if(drag){
-		// 	rect.w = (e.pageX - this.offsetLeft) - rect.startX;
-		// 	rect.h = (e.pageY - this.offsetTop) - rect.startY;
-		// 	this.ctx = clearRect(0,0,this.GAME_SETTINGS.WIDTH,this.GAME_SETTINGS.HEIGHT);
-		// }
 	};
 
-	this.mouseUp = function(e){
+	this.mouseUp = function(){
+		ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
 		drag = false;
-		this.ctx = clearRect(0,0,this.GAME_SETTINGS.WIDTH,this.GAME_SETTINGS.HEIGHT);
 	};
 
 	this.draw = function(){
-		this.ctx.strokeRect(rect.startX, rect.startY, rect.w, rect.h);
+		ctx.strokeStyle = '#000000';
+		ctx.strokeRect(rect.startX, rect.startY, rect.w, rect.h);
 	};
 }
 
@@ -334,7 +337,7 @@ const Img    = require('./imgimport.js');
 const Button = require('../objects/button.js');
 const Text   = require('../objects/text.js');
 const Dynamicrect = require('../objects/dynamicrect.js');
-const INTERVAL = 10;
+const INTERVAL = 1000/60;
 
 var params = [];
 var serverObjects = [];
@@ -574,33 +577,28 @@ var ready = {
 };
 
 var playing = {
-  misc: function(canvasDynamic,ctxD,GAME_SETTINGS){
+  misc: function(canvasUI,ctxU,GAME_SETTINGS){
     var self = this;
-    self.dynamicrect1 = new Dynamicrect();
-    // self.dynamicrect1.update = function(){
-
-    // }
+    self.dynamicrect1 = new Dynamicrect(canvasUI,ctxU,GAME_SETTINGS);
   },
 
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
-    this.misc(canvasDynamic,ctxD,GAME_SETTINGS);
+    this.misc(canvasUI,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-    playing.dynamicrect1.initialize(canvasDynamic,ctxD,GAME_SETTINGS);
-
-
+    playing.dynamicrect1.initialize();
     mainLoop = playing.loop;
   },
 
   loop: function(){
     playing.update();
+    //playing.dynamicrect1.draw();
   },
 
   update: function(){
-    playing.dynamicrect1.draw();
     drawObjects(params[4],serverObjects);
   },
 
-  destroy:function(){
+  destroy: function(){
 
   }
 };
@@ -827,6 +825,7 @@ module.exports = Canvas;
 function imgImport(imgName,ctx,callback){
 	var img = new Image();
 	img.onload = function(){
+		ctx.imageSmoothingEnabled = true;;
 		ctx.drawImage(img,0,0);
 		if (callback) {
     		callback();

@@ -1,6 +1,7 @@
 function imgImport(imgName,ctx,callback){
 	var img = new Image();
 	img.onload = function(){
+		ctx.imageSmoothingEnabled = true;;
 		ctx.drawImage(img,0,0);
 		if (callback) {
     		callback();

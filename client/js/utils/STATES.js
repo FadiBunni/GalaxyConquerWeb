@@ -3,7 +3,7 @@ const Img    = require('./imgimport.js');
 const Button = require('../objects/button.js');
 const Text   = require('../objects/text.js');
 const Dynamicrect = require('../objects/dynamicrect.js');
-const INTERVAL = 10;
+const INTERVAL = 1000/60;
 
 var params = [];
 var serverObjects = [];
@@ -243,33 +243,28 @@ var ready = {
 };
 
 var playing = {
-  misc: function(canvasDynamic,ctxD,GAME_SETTINGS){
+  misc: function(canvasUI,ctxU,GAME_SETTINGS){
     var self = this;
-    self.dynamicrect1 = new Dynamicrect();
-    // self.dynamicrect1.update = function(){
-
-    // }
+    self.dynamicrect1 = new Dynamicrect(canvasUI,ctxU,GAME_SETTINGS);
   },
 
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
-    this.misc(canvasDynamic,ctxD,GAME_SETTINGS);
+    this.misc(canvasUI,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-    playing.dynamicrect1.initialize(canvasDynamic,ctxD,GAME_SETTINGS);
-
-
+    playing.dynamicrect1.initialize();
     mainLoop = playing.loop;
   },
 
   loop: function(){
     playing.update();
+    //playing.dynamicrect1.draw();
   },
 
   update: function(){
-    playing.dynamicrect1.draw();
     drawObjects(params[4],serverObjects);
   },
 
-  destroy:function(){
+  destroy: function(){
 
   }
 };
