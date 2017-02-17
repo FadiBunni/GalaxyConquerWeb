@@ -80,7 +80,7 @@ var playing = {
 			isSet = false;
 		}
 		var statuses = getAllStatsFromPlanetsUpdate(room,createdAt);
-		console.log(statuses);
+		//console.log(statuses);
 		playing.io.to(room.id).emit('update', statuses);
 
 		//get statuses from all the objects in the room array, and send it to client

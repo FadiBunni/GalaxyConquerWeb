@@ -1,6 +1,5 @@
 var drawObjects = {
-
-  drawPlanets:function(ctx,status){
+  drawPlanets: function(ctx,status){
     //console.log(status);
     switch(status.role){
       case "grayzonePlanet":
@@ -10,6 +9,15 @@ var drawObjects = {
       case "playerPlanet":
         //console.log('playerPlanet');
         drawPlanets(ctx,status);
+        break;
+    }
+  },
+
+  selectBorder: function(ctx,status,socket){
+    switch (status.role){
+      case "playerPlanet":
+        //console.log('heeey');
+        drawBorderPlanet(ctx,status,socket);
         break;
     }
   },
@@ -43,6 +51,16 @@ function drawTextOnPlanets(ctx,status){
   ctx.fillStyle = "white";
   ctx.font = "16px verdana";
   ctx.fillText(status.planetScoreNumber,status.x,status.y);
+}
+
+function drawBorderPlanet(ctx,status,socket){
+  if(status.playerid === socket.id){;
+    ctx.save();
+    ctx.strokeStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(status.x,status.y,status.planetSize+3,0,2*Math.PI);
+    ctx.stroke();
+  }
 }
 
 function drawText(ctx, status){

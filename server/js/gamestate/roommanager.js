@@ -2,7 +2,6 @@ const STATES = require('../utils/STATES.js');
 const SETTINGS = require('../utils/SETTINGS.js');
 const Room = require('./room.js');
 
-
 function RoomManager(io){
 	var RmMg = this;
 	RmMg.rooms = {};
@@ -28,7 +27,6 @@ function RoomManager(io){
 		io.to(player0.id).emit('ready');
 		io.to(player1.id).emit('ready');
 		console.log('Room Created: ', roomId);
-
 	};
 
 	//Delete the players form array and destory the room
@@ -55,7 +53,6 @@ function RoomManager(io){
 			io.to(socket.id).emit('destroy', message);
 		});
 		delete RmMg.rooms[roomId];
-
 	};
 }
 module.exports = RoomManager;

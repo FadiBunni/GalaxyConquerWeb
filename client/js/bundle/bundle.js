@@ -1,7 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var drawObjects = {
-
-  drawPlanets:function(ctx,status){
+  drawPlanets: function(ctx,status){
     //console.log(status);
     switch(status.role){
       case "grayzonePlanet":
@@ -11,6 +10,15 @@ var drawObjects = {
       case "playerPlanet":
         //console.log('playerPlanet');
         drawPlanets(ctx,status);
+        break;
+    }
+  },
+
+  selectBorder: function(ctx,status,socket){
+    switch (status.role){
+      case "playerPlanet":
+        //console.log('heeey');
+        drawBorderPlanet(ctx,status,socket);
         break;
     }
   },
@@ -44,6 +52,16 @@ function drawTextOnPlanets(ctx,status){
   ctx.fillStyle = "white";
   ctx.font = "16px verdana";
   ctx.fillText(status.planetScoreNumber,status.x,status.y);
+}
+
+function drawBorderPlanet(ctx,status,socket){
+  if(status.playerid === socket.id){;
+    ctx.save();
+    ctx.strokeStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(status.x,status.y,status.planetSize+3,0,2*Math.PI);
+    ctx.stroke();
+  }
 }
 
 function drawText(ctx, status){
@@ -145,6 +163,7 @@ function Button() {
 	this.setEvents = function(canvas){
     //This is declared as an global object, try to add 'var' later.
     buttonObject = this;
+    //console.log(buttonObject);
     $(canvas).on('click', function(e){
       if(buttonObject.data){
         //console.log('clicked');
@@ -167,6 +186,7 @@ function Button() {
       if(e.type == 'mousemove'){
         x = e.offsetX;
         y = e.offsetY;
+        //console.log("buttonX: " + x);
       } else {
         x = e.changedTouches[0].clientX-e.changedTouches[0].target.offsetLeft;
         y = e.changedTouches[0].clientY-e.changedTouches[0].target.offsetTop;
@@ -327,7 +347,7 @@ const Img    = require('./imgimport.js');
 const Button = require('../objects/button.js');
 const Text   = require('../objects/text.js');
 const Dynamicrect = require('../objects/dynamicrect.js');
-const INTERVAL = 1000/60;
+const INTERVAL = 20;
 
 var params = [];
 var serverObjects = [];
@@ -357,7 +377,6 @@ var start = {
 
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
-
   	this.misc(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
     Img('spaceship',ctxS);
     start.button1.initialize(canvasUI,ctxU,GAME_SETTINGS, {
@@ -558,7 +577,6 @@ var ready = {
   },
 
   update: function(){
-    //console.log(serverObjects);
     drawTimerMessage(params[5],serverObjects);
   },
 
@@ -586,7 +604,12 @@ var playing = {
 
   update: function(){
     drawObjects(params[4],serverObjects);
-    console.log(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6]));
+    if(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6])){
+      drawBorderAroundPlanet(params[5],serverObjects,params[6]);
+    }else{
+      console.log('heey');
+      params[5].clearRect(0,0,params[7].WIDTH,params[7].HEIGHT);
+    }
   },
 
   destroy: function(){
@@ -703,6 +726,15 @@ function drawTimerMessage(ctx, serverObjects){
   }
 }
 
+function drawBorderAroundPlanet(ctx,serverObjects,socket){
+  this.serverObjects = serverObjects;
+  for(objects in serverObjects){
+    obj = serverObjects[objects];
+    Drawobjects.selectBorder(ctx,obj,socket);
+    //console.log(obj);
+  }
+}
+
 function setServerObjects(statuses){
   //serverObjects = [];
   this.statuses = statuses;
@@ -727,8 +759,6 @@ function setServerTimerMessage(statuses){
   //console.log(serverObjects);
 }
 
-
-// this function needs to know wich socket to work on!
 function planetDynamicRectIntersect(serverObjects,dynamicrect,socket){
   var rect = dynamicrect.rect;
   for(objects in serverObjects){

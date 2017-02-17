@@ -3,7 +3,7 @@ const Img    = require('./imgimport.js');
 const Button = require('../objects/button.js');
 const Text   = require('../objects/text.js');
 const Dynamicrect = require('../objects/dynamicrect.js');
-const INTERVAL = 1000/60;
+const INTERVAL = 20;
 
 var params = [];
 var serverObjects = [];
@@ -33,7 +33,6 @@ var start = {
 
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     //Run misc() to get all function inside it.
-
   	this.misc(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS);
     Img('spaceship',ctxS);
     start.button1.initialize(canvasUI,ctxU,GAME_SETTINGS, {
@@ -234,7 +233,6 @@ var ready = {
   },
 
   update: function(){
-    //console.log(serverObjects);
     drawTimerMessage(params[5],serverObjects);
   },
 
@@ -262,7 +260,12 @@ var playing = {
 
   update: function(){
     drawObjects(params[4],serverObjects);
-    console.log(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6]));
+    if(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6])){
+      drawBorderAroundPlanet(params[5],serverObjects,params[6]);
+    }else{
+      console.log('heey');
+      params[5].clearRect(0,0,params[7].WIDTH,params[7].HEIGHT);
+    }
   },
 
   destroy: function(){
@@ -379,6 +382,15 @@ function drawTimerMessage(ctx, serverObjects){
   }
 }
 
+function drawBorderAroundPlanet(ctx,serverObjects,socket){
+  this.serverObjects = serverObjects;
+  for(objects in serverObjects){
+    obj = serverObjects[objects];
+    Drawobjects.selectBorder(ctx,obj,socket);
+    //console.log(obj);
+  }
+}
+
 function setServerObjects(statuses){
   //serverObjects = [];
   this.statuses = statuses;
@@ -403,8 +415,6 @@ function setServerTimerMessage(statuses){
   //console.log(serverObjects);
 }
 
-
-// this function needs to know wich socket to work on!
 function planetDynamicRectIntersect(serverObjects,dynamicrect,socket){
   var rect = dynamicrect.rect;
   for(objects in serverObjects){
