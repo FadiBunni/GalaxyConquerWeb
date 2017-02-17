@@ -252,16 +252,17 @@ var playing = {
     this.misc(canvasUI,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
     playing.dynamicrect1.initialize();
+
     mainLoop = playing.loop;
   },
 
   loop: function(){
     playing.update();
-    //playing.dynamicrect1.draw();
   },
 
   update: function(){
     drawObjects(params[4],serverObjects);
+    console.log(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6]));
   },
 
   destroy: function(){
@@ -365,8 +366,8 @@ function drawObjects(ctx,serverObjects){
   for(objects in serverObjects){
     obj = serverObjects[objects];
     Drawobjects.drawPlanets(ctx,obj);
+    //console.log(obj);
   }
-  //console.log(obj);
 }
 
 function drawTimerMessage(ctx, serverObjects){
@@ -374,8 +375,8 @@ function drawTimerMessage(ctx, serverObjects){
   for(objects in serverObjects){
     obj = serverObjects[objects];
     Drawobjects.timer(ctx,obj);
+    //console.log(obj);
   }
-  //console.log(serverObjects);
 }
 
 function setServerObjects(statuses){
@@ -400,4 +401,32 @@ function setServerTimerMessage(statuses){
     }
   };
   //console.log(serverObjects);
+}
+
+
+// this function needs to know wich socket to work on!
+function planetDynamicRectIntersect(serverObjects,dynamicrect,socket){
+  var rect = dynamicrect.rect;
+  for(objects in serverObjects){
+    var obj = serverObjects[objects];
+    if(obj.playerid === socket.id){
+      var circle = obj;
+      var distX = Math.abs(circle.x - (rect.startX - rect.w / 2));
+      var distY = Math.abs(circle.y - (rect.startY - rect.h / 2));
+      // console.log("circle.x: " + circle.x);
+      // console.log("circle.y: " + circle.y);
+      // console.log("distanceX" + distX);
+      // console.log("distanceY" + distY);
+
+      if(distX > (rect.w / 2 + circle.planetSize)){return false;}
+      if(distY > (rect.h / 2 + circle.planetSize)){return false;}
+
+      if(distX <= (rect.w / 2)){return true;}
+      if(distY <= (rect.h / 2)){return true;}
+
+      var dx = distX-rect.w/2;
+      var dy = distY-rect.h/2;
+      return (dx*dx+dy*dy <= (circle.planetSize*circle.planetSize));
+    }
+  }
 }

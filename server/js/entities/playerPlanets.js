@@ -1,9 +1,9 @@
 const SETTINGS = require('../utils/SETTINGS.js');
 const Baseobject = require("../utils/baseobject.js");
 
-function playerPlanets(id,playerid,side,xPos,yPos,planetSize,planetScoreNumber){
+function playerPlanets(playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 	Baseobject.call(this);
-	this.id = id;
+	this.playerid = playerid;
 	this.createdAt = Date.now();
 	this.side = side;
 	this.xPos = xPos;
@@ -23,7 +23,7 @@ function playerPlanets(id,playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 	};
 	this.status.planet  = {
 		role:this.role,
-		id:id,
+		playerid:playerid,
 		planetSize:planetSize,
 		planetScoreNumber:planetScoreNumber,
 		color:this.color,

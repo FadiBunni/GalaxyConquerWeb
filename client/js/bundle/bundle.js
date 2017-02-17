@@ -145,7 +145,6 @@ function Button() {
 	this.setEvents = function(canvas){
     //This is declared as an global object, try to add 'var' later.
     buttonObject = this;
-    //console.log(buttonObject);
     $(canvas).on('click', function(e){
       if(buttonObject.data){
         //console.log('clicked');
@@ -168,7 +167,6 @@ function Button() {
       if(e.type == 'mousemove'){
         x = e.offsetX;
         y = e.offsetY;
-        //console.log("buttonX: " + x);
       } else {
         x = e.changedTouches[0].clientX-e.changedTouches[0].target.offsetLeft;
         y = e.changedTouches[0].clientY-e.changedTouches[0].target.offsetTop;
@@ -220,7 +218,7 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 	this.canvas = canvas;
 	this.ctx = ctx;
 	this.GAME_SETTINGS = GAME_SETTINGS;
-	var rect = {};
+	this.rect = {};
 	var drag = false;
 
 	this.initialize = function(){
@@ -246,23 +244,23 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 	};
 
 	this.mouseDown = function(e){
-		rect.w = null;
-		rect.h = null;
+		this.rect.w = null;
+		this.rect.h = null;
 		if(e.type == 'mousedown'){
-		rect.startX = e.offsetX;
-		rect.startY = e.offsetY;
-		// console.log("rect_startX: " + rect.startX);
-		// console.log("rect_startY: " + rect.startY);
+		this.rect.startX = e.offsetX;
+		this.rect.startY = e.offsetY;
+		// console.log("rect_startX: " + this.rect.startX);
+		// console.log("rect_startY: " + this.rect.startY);
 		}
 		drag = true;
 	};
 
 	this.mouseMove = function(e){
 		if(drag && e.type == 'mousemove'){
-			rect.w = e.offsetX - rect.startX;
-			rect.h = e.offsetY - rect.startY;
-			// console.log("rectdragW: "+ rect.w)
-			// console.log("rectdragH: "+ rect.h)
+			this.rect.w = e.offsetX - this.rect.startX;
+			this.rect.h = e.offsetY - this.rect.startY;
+			// console.log("rectdragW: "+ this.rect.w)
+			// console.log("rectdragH: "+ this.rect.h)
 			ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
 			this.draw();
 		}
@@ -275,19 +273,11 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 
 	this.draw = function(){
 		ctx.strokeStyle = '#000000';
-		ctx.strokeRect(rect.startX, rect.startY, rect.w, rect.h);
+		ctx.strokeRect(this.rect.startX, this.rect.startY, this.rect.w, this.rect.h);
 	};
 }
 
 module.exports = Dynamicrect;
-
-function getMousePos(canvas, evt) {
-    var rect = canvas.getBoundingClientRect();
-    return {
-        x: evt.clientX - rect.left,
-        y: evt.clientY - rect.top
-    };
-}
 },{}],5:[function(require,module,exports){
 function Text(){
 	this.initialize = function(canvas,ctx,GAME_SETTINGS,data){
@@ -586,16 +576,17 @@ var playing = {
     this.misc(canvasUI,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
     playing.dynamicrect1.initialize();
+
     mainLoop = playing.loop;
   },
 
   loop: function(){
     playing.update();
-    //playing.dynamicrect1.draw();
   },
 
   update: function(){
     drawObjects(params[4],serverObjects);
+    console.log(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6]));
   },
 
   destroy: function(){
@@ -699,8 +690,8 @@ function drawObjects(ctx,serverObjects){
   for(objects in serverObjects){
     obj = serverObjects[objects];
     Drawobjects.drawPlanets(ctx,obj);
+    //console.log(obj);
   }
-  //console.log(obj);
 }
 
 function drawTimerMessage(ctx, serverObjects){
@@ -708,8 +699,8 @@ function drawTimerMessage(ctx, serverObjects){
   for(objects in serverObjects){
     obj = serverObjects[objects];
     Drawobjects.timer(ctx,obj);
+    //console.log(obj);
   }
-  //console.log(serverObjects);
 }
 
 function setServerObjects(statuses){
@@ -734,6 +725,34 @@ function setServerTimerMessage(statuses){
     }
   };
   //console.log(serverObjects);
+}
+
+
+// this function needs to know wich socket to work on!
+function planetDynamicRectIntersect(serverObjects,dynamicrect,socket){
+  var rect = dynamicrect.rect;
+  for(objects in serverObjects){
+    var obj = serverObjects[objects];
+    if(obj.playerid === socket.id){
+      var circle = obj;
+      var distX = Math.abs(circle.x - (rect.startX - rect.w / 2));
+      var distY = Math.abs(circle.y - (rect.startY - rect.h / 2));
+      // console.log("circle.x: " + circle.x);
+      // console.log("circle.y: " + circle.y);
+      // console.log("distanceX" + distX);
+      // console.log("distanceY" + distY);
+
+      if(distX > (rect.w / 2 + circle.planetSize)){return false;}
+      if(distY > (rect.h / 2 + circle.planetSize)){return false;}
+
+      if(distX <= (rect.w / 2)){return true;}
+      if(distY <= (rect.h / 2)){return true;}
+
+      var dx = distX-rect.w/2;
+      var dy = distY-rect.h/2;
+      return (dx*dx+dy*dy <= (circle.planetSize*circle.planetSize));
+    }
+  }
 }
 },{"../entities/drawObjects.js":1,"../objects/button.js":3,"../objects/dynamicrect.js":4,"../objects/text.js":5,"./imgimport.js":8}],7:[function(require,module,exports){
 var Canvas = {
