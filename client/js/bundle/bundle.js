@@ -353,9 +353,12 @@ var params = [];
 var serverObjects = [];
 
 var mainLoop = function(){};
-var interval = setInterval(function(){
+function theLoop(){
   mainLoop();
-},INTERVAL);
+
+  requestAnimationFrame(theLoop);
+}
+requestAnimationFrame(theLoop);
 
 var start = {
   misc: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
