@@ -11,9 +11,11 @@ function grayzonePlanets(id){
 	var yPos = Math.round((Math.random()*SETTINGS.HEIGHT));
 
 	this.id = id;
+	this.playerid = null;
 	this.role = "grayzonePlanet";
 	this.status.planet   = {
 		id:id,
+		playerid:this.playerid,
 		role:this.role,
 		planetSize:planetSize,
 		planetScoreNumber:planetScoreNumber,

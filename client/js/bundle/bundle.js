@@ -59,7 +59,7 @@ function drawBorderPlanet(ctx,status,socket){
     ctx.save();
     ctx.strokeStyle = 'white';
     ctx.beginPath();
-    ctx.arc(status.x,status.y,status.planetSize+3,0,2*Math.PI);
+    ctx.arc(status.x,status.y,status.planetSize+1,0,2*Math.PI);
     ctx.stroke();
   }
 }
@@ -355,7 +355,6 @@ var serverObjects = [];
 var mainLoop = function(){};
 function theLoop(){
   mainLoop();
-
   requestAnimationFrame(theLoop);
 }
 requestAnimationFrame(theLoop);
@@ -571,16 +570,12 @@ var ready = {
   },
 
   loop: function(){
-    ready.update();
+    drawTimerMessage(params[5],serverObjects);
     if(ready.button1.data){
       ready.button1.update();
       ready.button1.draw();
     }
     ready.text1.draw();
-  },
-
-  update: function(){
-    drawTimerMessage(params[5],serverObjects);
   },
 
   destroy:function(){
@@ -602,16 +597,11 @@ var playing = {
   },
 
   loop: function(){
-    playing.update();
-  },
-
-  update: function(){
+    clearBackground(params[4],params[7]);
     drawObjects(params[4],serverObjects);
+    console.log(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6]));
     if(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6])){
       drawBorderAroundPlanet(params[5],serverObjects,params[6]);
-    }else{
-      console.log('heey');
-      params[5].clearRect(0,0,params[7].WIDTH,params[7].HEIGHT);
     }
   },
 
@@ -762,31 +752,45 @@ function setServerTimerMessage(statuses){
   //console.log(serverObjects);
 }
 
+function clearBackground(ctx, GAME_SETTINGS){
+  ctx.save();
+  ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+  ctx.restore();
+}
+
 function planetDynamicRectIntersect(serverObjects,dynamicrect,socket){
   var rect = dynamicrect.rect;
   for(objects in serverObjects){
     var obj = serverObjects[objects];
     if(obj.playerid === socket.id){
       var circle = obj;
-      var distX = Math.abs(circle.x - (rect.startX - rect.w / 2));
-      var distY = Math.abs(circle.y - (rect.startY - rect.h / 2));
+      var distX  = Math.abs(circle.x - (rect.startX + rect.w / 2));
+      var distY  = Math.abs(circle.y - (rect.startY + rect.h / 2));
+      var absRectWidth = Math.abs(rect.w);
+      var absRectHeight = Math.abs(rect.h);
+
       // console.log("circle.x: " + circle.x);
       // console.log("circle.y: " + circle.y);
+      // console.log("rect.startX: " + rect.startX);
+      // console.log("rect.startY: " + rect.startY);
+      // console.log("rect.w: " + rect.w);
+      // console.log("rect.h: " + rect.h);
       // console.log("distanceX" + distX);
       // console.log("distanceY" + distY);
 
-      if(distX > (rect.w / 2 + circle.planetSize)){return false;}
-      if(distY > (rect.h / 2 + circle.planetSize)){return false;}
+      if(distX > (absRectWidth / 2 + circle.planetSize)){return false;}
+      if(distY > (absRectHeight / 2 + circle.planetSize)){return false;}
 
-      if(distX <= (rect.w / 2)){return true;}
-      if(distY <= (rect.h / 2)){return true;}
+      if(distX <= (absRectWidth / 2)){return true;}
+      if(distY <= (absRectHeight / 2)){return true;}
 
-      var dx = distX-rect.w/2;
-      var dy = distY-rect.h/2;
+      var dx = distX-absRectWidth/2;
+      var dy = distY-absRectHeight/2;
       return (dx*dx+dy*dy <= (circle.planetSize*circle.planetSize));
     }
   }
 }
+
 },{"../entities/drawObjects.js":1,"../objects/button.js":3,"../objects/dynamicrect.js":4,"../objects/text.js":5,"./imgimport.js":8}],7:[function(require,module,exports){
 var Canvas = {
 	getPixelRatio : function getPixelRatio(ctx) {

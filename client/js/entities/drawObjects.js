@@ -58,7 +58,7 @@ function drawBorderPlanet(ctx,status,socket){
     ctx.save();
     ctx.strokeStyle = 'white';
     ctx.beginPath();
-    ctx.arc(status.x,status.y,status.planetSize+3,0,2*Math.PI);
+    ctx.arc(status.x,status.y,status.planetSize+1,0,2*Math.PI);
     ctx.stroke();
   }
 }
