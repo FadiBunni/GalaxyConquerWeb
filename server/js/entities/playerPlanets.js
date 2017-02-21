@@ -15,13 +15,13 @@ function playerPlanets(playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 
 	this.role = "playerPlanet";
 	//this can be used to only send x,y and planetscore data
-	this.status.score ={
+	this.status.score = {
 		role:this.role,
 		x:xPos,
 		y:yPos,
 		planetScoreNumber:planetScoreNumber
 	};
-	this.status.planet  = {
+	this.status.planet = {
 		role:this.role,
 		playerid:playerid,
 		planetSize:planetSize,

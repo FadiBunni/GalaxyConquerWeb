@@ -35,8 +35,6 @@ function spawnGrayzonePlanets(Rm,amoutOfGrayzonePlanet,grayzonePlanet, planetDis
 
 	while(Object.keys(Rm.objects).length < amoutOfGrayzonePlanet){
 		var currentGrayzonePlanet = new grayzonePlanet(Object.keys(Rm.objects).length);
-		//console.log("currentPlanet: " + currentGrayzonePlanet.status.cic.x);
-
 
 		if(!checkPlanetCollision(Rm,currentGrayzonePlanet,planetDistance) && currentGrayzonePlanet.checkWindowCollision()){
 			Rm.objects[Object.keys(Rm.objects).length] = currentGrayzonePlanet;

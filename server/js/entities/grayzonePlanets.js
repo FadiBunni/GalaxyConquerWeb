@@ -38,7 +38,11 @@ function grayzonePlanets(id){
 	};
 
 	//remove this metod when you have updated the STATE.
-	this.update = function(){};
+	this.update = function(){
+		// remember to update the planetScoreNumber when ships hits.
+
+
+	};
 }
 
 module.exports = grayzonePlanets;
