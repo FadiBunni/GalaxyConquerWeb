@@ -253,12 +253,14 @@ var playing = {
   },
 
   loop: function(){
-    clearBackground(params[4],params[7]);
+    //clearBackground(params[4],params[7]);
+
     drawObjects(params[4],serverObjects);
-    console.log(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6]));
+    Drawobjects.drawShips(params[4]);
     if(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6])){
       drawBorderAroundPlanet(params[5],serverObjects,params[6]);
     }
+
   },
 
   destroy: function(){
@@ -370,7 +372,7 @@ function drawTimerMessage(ctx, serverObjects){
   this.serverObjects = serverObjects;
   for(objects in serverObjects){
     obj = serverObjects[objects];
-    Drawobjects.timer(ctx,obj);
+    Drawobjects.Timer(ctx,obj);
     //console.log(obj);
   }
 }

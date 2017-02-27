@@ -4,7 +4,11 @@ function ships(id, playerid, startPlanet, endPlanet){
 	Baseobject.call(this);
 	this.id = id;
 	this.playerid = playerid;
-	this.role = "ship";
+	this.startPlanet = startPlanet;
+	this.endPlanet = endPlanet;
+	this.amoutOfAttack = 1;
+	this.speed = 2;
+	this.role = "Ship";
 
 
 	this.status.ship = {

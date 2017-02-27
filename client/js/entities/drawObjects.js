@@ -13,6 +13,14 @@ var drawObjects = {
     }
   },
 
+  drawShips: function(ctx){
+    // switch(status.role){
+    //   case "Ships":
+        drawShips(ctx);
+        // break;
+    // }
+  },
+
   selectBorder: function(ctx,status,socket){
     switch (status.role){
       case "playerPlanet":
@@ -22,11 +30,11 @@ var drawObjects = {
     }
   },
 
-  timer: function(ctx,status){
+  Timer: function(ctx,status){
     switch(status.role){
       case "countdown":
         //console.log('countdown');
-        drawText(ctx,status);
+        drawTimerText(ctx,status);
         break;
     }
   }
@@ -53,6 +61,25 @@ function drawTextOnPlanets(ctx,status){
   ctx.fillText(status.planetScoreNumber,status.x,status.y);
 }
 
+function drawShips(ctx){
+  console.log("drawing!");
+  //The triangle
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(100,100);
+  ctx.lineTo(100,300);
+  ctx.lineTo(300,300);
+  ctx.closePath();
+  //The outline
+  ctx.lineWidth =1;
+  ctx.strokeStyle = 'black';
+  ctx.stroke();
+  //the fill color
+  ctx.fillStyle = "#FFCC00";
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawBorderPlanet(ctx,status,socket){
   if(status.playerid === socket.id){;
     ctx.save();
@@ -63,7 +90,7 @@ function drawBorderPlanet(ctx,status,socket){
   }
 }
 
-function drawText(ctx, status){
+function drawTimerText(ctx, status){
   if(!status.color) return;
   ctx.clearRect(status.x-32,status.y-22,64,42);
   ctx.save();

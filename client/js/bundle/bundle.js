@@ -14,6 +14,14 @@ var drawObjects = {
     }
   },
 
+  drawShips: function(ctx){
+    // switch(status.role){
+    //   case "Ships":
+        drawShips(ctx);
+        // break;
+    // }
+  },
+
   selectBorder: function(ctx,status,socket){
     switch (status.role){
       case "playerPlanet":
@@ -23,11 +31,11 @@ var drawObjects = {
     }
   },
 
-  timer: function(ctx,status){
+  Timer: function(ctx,status){
     switch(status.role){
       case "countdown":
         //console.log('countdown');
-        drawText(ctx,status);
+        drawTimerText(ctx,status);
         break;
     }
   }
@@ -54,6 +62,25 @@ function drawTextOnPlanets(ctx,status){
   ctx.fillText(status.planetScoreNumber,status.x,status.y);
 }
 
+function drawShips(ctx){
+  console.log("drawing!");
+  //The triangle
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(100,100);
+  ctx.lineTo(100,300);
+  ctx.lineTo(300,300);
+  ctx.closePath();
+  //The outline
+  ctx.lineWidth =1;
+  ctx.strokeStyle = 'black';
+  ctx.stroke();
+  //the fill color
+  ctx.fillStyle = "#FFCC00";
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawBorderPlanet(ctx,status,socket){
   if(status.playerid === socket.id){;
     ctx.save();
@@ -64,7 +91,7 @@ function drawBorderPlanet(ctx,status,socket){
   }
 }
 
-function drawText(ctx, status){
+function drawTimerText(ctx, status){
   if(!status.color) return;
   ctx.clearRect(status.x-32,status.y-22,64,42);
   ctx.save();
@@ -251,7 +278,11 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 		rectObject = this;
 
 		$(canvas).on('mousedown',function(e){
-			rectObject.mouseDown(e)
+			// switch (event.which){
+			// 	case 1:
+					rectObject.mouseDown(e);
+			// 		break;
+			// }
 		});
 
 		$(canvas).on('mousemove',function(e){
@@ -597,12 +628,14 @@ var playing = {
   },
 
   loop: function(){
-    clearBackground(params[4],params[7]);
+    //clearBackground(params[4],params[7]);
+
     drawObjects(params[4],serverObjects);
-    console.log(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6]));
+    Drawobjects.drawShips(params[4]);
     if(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6])){
       drawBorderAroundPlanet(params[5],serverObjects,params[6]);
     }
+
   },
 
   destroy: function(){
@@ -714,7 +747,7 @@ function drawTimerMessage(ctx, serverObjects){
   this.serverObjects = serverObjects;
   for(objects in serverObjects){
     obj = serverObjects[objects];
-    Drawobjects.timer(ctx,obj);
+    Drawobjects.Timer(ctx,obj);
     //console.log(obj);
   }
 }
@@ -860,6 +893,9 @@ var Canvas = {
 	  console.log('Generating canvasDynamic.');
 
 	  var canvas = document.getElementById('canvasUI');
+	  canvas.oncontextmenu = function() {
+		return false;
+	  }
 	  var ctx = canvas.getContext('2d');
 	  // Pass our canvas' context to our getPixelRatio method
 	  var ratio = this.getPixelRatio(ctx);

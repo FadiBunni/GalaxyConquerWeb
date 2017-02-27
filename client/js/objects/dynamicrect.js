@@ -15,7 +15,11 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 		rectObject = this;
 
 		$(canvas).on('mousedown',function(e){
-			rectObject.mouseDown(e)
+			// switch (event.which){
+			// 	case 1:
+					rectObject.mouseDown(e);
+			// 		break;
+			// }
 		});
 
 		$(canvas).on('mousemove',function(e){

@@ -66,6 +66,9 @@ var Canvas = {
 	  console.log('Generating canvasDynamic.');
 
 	  var canvas = document.getElementById('canvasUI');
+	  canvas.oncontextmenu = function() {
+		return false;
+	  }
 	  var ctx = canvas.getContext('2d');
 	  // Pass our canvas' context to our getPixelRatio method
 	  var ratio = this.getPixelRatio(ctx);
