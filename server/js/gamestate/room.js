@@ -1,5 +1,5 @@
-var grayzonePlanet = require('../entities/grayzonePlanets.js');
-var playerPlanet = require('../entities/playerPlanets.js');
+const grayzonePlanet = require('../entities/grayzonePlanets.js');
+const playerPlanet = require('../entities/playerPlanets.js');
 
 function Room (RmMg, io, id, player0, player1){
 	var amoutOfGrayzonePlanet = 20;
@@ -9,6 +9,7 @@ function Room (RmMg, io, id, player0, player1){
 	Rm.id = id;
 	Rm.players = [player0,player1];
 	Rm.objects = {};
+	Rm.ships   = {};
 
 	//Add players.
 	Rm.objects[Rm.players[0].id] = new playerPlanet(Rm.players[0].id,"left",115,115,100,50);

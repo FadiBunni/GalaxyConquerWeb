@@ -83,6 +83,10 @@ var playing = {
 		//console.log(statuses);
 		playing.io.to(room.id).emit('update', statuses);
 
+		var statuses = spawnShips(room);
+
+		//playing.io.to(room.id).emit('update', statuses);
+
 		//get statuses from all the objects in the room array, and send it to client
 		// if(room.status == "playing" && (room.objects[room.players[0].id].score>=SETTINGS.GOAL || room.objects[room.players[1].id].score>=SETTINGS.GOAL)){
 		// 	room.status = "gameOver";
@@ -147,6 +151,22 @@ function getAllStatsFromPlanetsUpdate(room,createdAt){
 			//console.log(obj.status.planet);
 			statuses.push(obj.status.planet);
 		}
+	}
+	//console.log(statuses);
+	return statuses;
+}
+
+function spawnShips(room){
+	statuses = [];
+	//Object is all the objects in the object array in room "class".
+	for(var object in room.objects){
+		//console.log("object: " + object);
+		//Get the specific class/entity.
+		var obj = room.objects[object];
+		if(obj.spawnShips){
+			obj.spawnShips(room);
+		}
+		//console.log(obj.spawnShips);
 	}
 	//console.log(statuses);
 	return statuses;

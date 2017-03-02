@@ -2,6 +2,7 @@ const Baseobject = require("../utils/baseobject.js");
 
 function ships(id, playerid, startPlanet, endPlanet){
 	Baseobject.call(this);
+	var xPos,yPos,xEnd,yEnd;
 	this.id = id;
 	this.playerid = playerid;
 	this.startPlanet = startPlanet;
@@ -18,6 +19,15 @@ function ships(id, playerid, startPlanet, endPlanet){
 
 	this.update = function(room){};
 
+	this.spawnShipsAroundPlayerPlanets = function(startPlanet){
 
+	};
 
+	this.getDirectionToCoords = function(xEnd, yEnd){
+
+	};
+
+	var moveShips = function(){
+
+	};
 }

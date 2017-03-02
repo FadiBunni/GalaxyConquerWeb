@@ -69,7 +69,7 @@ function drawShips(ctx){
   ctx.beginPath();
   ctx.moveTo(100,100);
   ctx.lineTo(100,300);
-  ctx.lineTo(300,300);
+  ctx.lineTo(150,300);
   ctx.closePath();
   //The outline
   ctx.lineWidth =1;

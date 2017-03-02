@@ -1,5 +1,6 @@
 const SETTINGS = require('../utils/SETTINGS.js');
 const Baseobject = require("../utils/baseobject.js");
+const Ships = require("./ships.js");
 
 function playerPlanets(playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 	Baseobject.call(this);
@@ -31,10 +32,15 @@ function playerPlanets(playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 		y:yPos
 	};
 
+	this.spawnShips = function(room){
+		for(var i = 0; i-planetScoreNumber / 2 < planetScoreNumber / 2; i++){
+			console.log(room.ships);
+		}
+	};
+
 	this.update = function(room,createdAt){
 		var counter = Math.floor((Date.now()-createdAt)/1000);
 		//console.log(createdAt);
-
 		this.status.planet.planetScoreNumber = planetScoreNumber;
 		this.status.planet.planetScoreNumber += counter;
 	};

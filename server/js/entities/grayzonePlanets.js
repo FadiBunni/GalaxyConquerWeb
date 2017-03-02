@@ -37,6 +37,8 @@ function grayzonePlanets(id){
 		}else return true;
 	};
 
+	//this.spawnShips = function() {};
+
 	//remove this metod when you have updated the STATE.
 	this.update = function(){
 		// remember to update the planetScoreNumber when ships hits.
