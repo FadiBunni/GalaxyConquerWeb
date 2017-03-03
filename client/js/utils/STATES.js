@@ -254,9 +254,9 @@ var playing = {
 
   loop: function(){
     //clearBackground(params[4],params[7]);
-
+    //params[6].emit('spawnShips');
     drawObjects(params[4],serverObjects);
-    Drawobjects.drawShips(params[4]);
+    //Drawobjects.drawShips(params[4]);
     if(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6])){
       drawBorderAroundPlanet(params[5],serverObjects,params[6]);
     }

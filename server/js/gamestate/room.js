@@ -8,17 +8,17 @@ function Room (RmMg, io, id, player0, player1){
 	Rm.RmMg = RmMg;
 	Rm.id = id;
 	Rm.players = [player0,player1];
-	Rm.objects = {};
-	Rm.ships   = {};
+	Rm.planets = {};
+	Rm.countDownObject = {};
 
 	//Add players.
-	Rm.objects[Rm.players[0].id] = new playerPlanet(Rm.players[0].id,"left",115,115,100,50);
-	Rm.objects[Rm.players[1].id] = new playerPlanet(Rm.players[1].id,"right",1165,685,100,50);
+	Rm.planets[Rm.players[0].id] = new playerPlanet(Rm.players[0].id,"left",115,115,100,50);
+	Rm.planets[Rm.players[1].id] = new playerPlanet(Rm.players[1].id,"right",1165,685,100,50);
 	//Spawns grayzoneplanets with window collision and planet collision, see the functions below and in grayzonePlanets class.
-	spawnGrayzonePlanets(Rm,amoutOfGrayzonePlanet,grayzonePlanet, planetDistance);
-	// console.log(Rm.objects[0]);
-	// console.log(Rm.objects[1]);
-	// console.log(Object.keys(Rm.objects).length);
+	spawnGrayzonePlanets(Rm,amoutOfGrayzonePlanet,grayzonePlanet,planetDistance);
+	// console.log(Rm.planets[0]);
+	// console.log(Rm.planets[1]);
+	// console.log(Object.keys(Rm.planets).length);
 
 
 	//The room.loop is set in STATES.js!!!!!!!!
@@ -34,18 +34,18 @@ module.exports = Room;
 
 function spawnGrayzonePlanets(Rm,amoutOfGrayzonePlanet,grayzonePlanet, planetDistance){
 
-	while(Object.keys(Rm.objects).length < amoutOfGrayzonePlanet){
-		var currentGrayzonePlanet = new grayzonePlanet(Object.keys(Rm.objects).length);
+	while(Object.keys(Rm.planets).length < amoutOfGrayzonePlanet){
+		var currentGrayzonePlanet = new grayzonePlanet(Object.keys(Rm.planets).length);
 
 		if(!checkPlanetCollision(Rm,currentGrayzonePlanet,planetDistance) && currentGrayzonePlanet.checkWindowCollision()){
-			Rm.objects[Object.keys(Rm.objects).length] = currentGrayzonePlanet;
+			Rm.planets[Object.keys(Rm.planets).length] = currentGrayzonePlanet;
 		}
 	}
 }
 
 function checkPlanetCollision(Rm,currentGrayzonePlanet,planetDistance){
-	for(var object in Rm.objects){
-		var obj = Rm.objects[object];
+	for(var object in Rm.planets){
+		var obj = Rm.planets[object];
 		//console.log(obj);
 
 		var currentGrayzonePlanetGetX = currentGrayzonePlanet.status.planet.x;

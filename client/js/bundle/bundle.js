@@ -14,12 +14,12 @@ var drawObjects = {
     }
   },
 
-  drawShips: function(ctx){
-    // switch(status.role){
-    //   case "Ships":
-        drawShips(ctx);
-        // break;
-    // }
+  drawShips: function(ctx,status){
+    switch(status.role){
+      case "Ships":
+        drawShips(ctx,status);
+        break;
+    }
   },
 
   selectBorder: function(ctx,status,socket){
@@ -43,7 +43,7 @@ var drawObjects = {
 
 module.exports = drawObjects;
 
-function drawPlanets(ctx, status){
+function drawPlanets(ctx,status){
   ctx.save();
   ctx.fillStyle = status.color;
   ctx.globalAlpha = 0.85;
@@ -62,7 +62,7 @@ function drawTextOnPlanets(ctx,status){
   ctx.fillText(status.planetScoreNumber,status.x,status.y);
 }
 
-function drawShips(ctx){
+function drawShips(ctx,status){
   console.log("drawing!");
   //The triangle
   ctx.save();
@@ -629,9 +629,9 @@ var playing = {
 
   loop: function(){
     //clearBackground(params[4],params[7]);
-
+    //params[6].emit('spawnShips');
     drawObjects(params[4],serverObjects);
-    Drawobjects.drawShips(params[4]);
+    //Drawobjects.drawShips(params[4]);
     if(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6])){
       drawBorderAroundPlanet(params[5],serverObjects,params[6]);
     }

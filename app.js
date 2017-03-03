@@ -48,7 +48,11 @@ io.on('connection', function(socket){
 
     socket.on('ready', function(){
         var roomIndex = roomManager.roomIndex[socket.id];
-        if(roomIndex) roomManager.rooms[roomIndex].objects[socket.id].ready = true;
+        if(roomIndex) roomManager.rooms[roomIndex].planets[socket.id].ready = true;
     });
+
+    // socket.on('spawnShips', function(){
+    //     console.log('heey');
+    // });
 });
 

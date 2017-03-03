@@ -4,6 +4,7 @@ const SETTINGS = require('./SETTINGS.js');
 var statuses = [];
 var isSet = false;
 var createdAt;
+var number = 1;
 
 var ready = {
 	initialize: function(io,room){
@@ -16,19 +17,19 @@ var ready = {
 		//console.log(statuses);
 		io.to(room.id).emit('init', statuses);
 
-		room.objects.countdown = new Countdown(30,null,SETTINGS.HEIGHT/2-100,null,true);
-    	room.objects.countdown.action = function(room){
+		room.countDownObject.countdown = new Countdown(30,null,SETTINGS.HEIGHT/2-100,null,true);
+    	room.countDownObject.countdown.action = function(room){
    //  		Destroy can be called because RmMg is inside the room contructor.
 			// Calling the destroy function in RmMg not in this 'ready' variable
-     		delete room.objects.countdown;
+     		delete room.countDownObject.countdown;
       		room.RmMg.destroy(room.id);
     	};
     	room.loop = this.loop;
 	},
 
 	loop: function(room){
-		var player0ready = room.objects[room.players[0].id].ready;
-		var player1ready = room.objects[room.players[1].id].ready;
+		var player0ready = room.planets[room.players[0].id].ready;
+		var player1ready = room.planets[room.players[1].id].ready;
 		// if both players is ready, destroy the room, and initialize the game(playing)
 		if(player0ready && player1ready) {
 			playing.initialize(ready.io,room);
@@ -50,9 +51,9 @@ var playing = {
 		room.status = "countdown";
 		//Set the loop in the room "class" equal to the loop in ready object
 
-		room.objects.countdown = new Countdown(1,null,SETTINGS.HEIGHT/2-100,null,true);
-    	room.objects.countdown.action = function(room){
-      		delete room.objects.countdown;
+		room.countDownObject.countdown = new Countdown(1,null,SETTINGS.HEIGHT/2-100,null,true);
+    	room.countDownObject.countdown.action = function(room){
+      		delete room.countDownObject.countdown;
       		room.status = "playing";
    		};
 
@@ -62,7 +63,7 @@ var playing = {
 	},
 
 	preloop: function(room){
-		if(room.objects.countdown.status.count.message !== 0){
+		if(room.countDownObject.countdown.status.count.message !== 0){
 			var statuses = getCountdownMessage(room);
 			if(statuses[0].message <= 0){
 				playing.io.to(room.id).emit('playing');
@@ -83,15 +84,18 @@ var playing = {
 		//console.log(statuses);
 		playing.io.to(room.id).emit('update', statuses);
 
-		var statuses = spawnShips(room);
+		if(number ===1)
+			console.log('hey')
+			spawnShips(room);
+		number = 0;
 
 		//playing.io.to(room.id).emit('update', statuses);
 
 		//get statuses from all the objects in the room array, and send it to client
-		// if(room.status == "playing" && (room.objects[room.players[0].id].score>=SETTINGS.GOAL || room.objects[room.players[1].id].score>=SETTINGS.GOAL)){
+		// if(room.status == "playing" && (room.planets[room.players[0].id].score>=SETTINGS.GOAL || room.planets[room.players[1].id].score>=SETTINGS.GOAL)){
 		// 	room.status = "gameOver";
 		// } else if(room.status == "gameOver"){
-		// 	if(room.objects[room.players[0].id].score>room.objects[room.players[1].id].score){
+		// 	if(room.planets[room.players[0].id].score>room.planets[room.players[1].id].score){
   //       		room.RmMg.gameOver(room.id,room.players[0].id);
   //     		} else {
   //       		room.RmMg.gameOver(room.id,room.players[1].id);
@@ -108,10 +112,10 @@ module.exports = {ready,playing};
 function getAllStatsFromPlanets(room){
 	statuses = [];
 	//Object is all the objects in the object array in room "class".
-	for(var object in room.objects){
+	for(var object in room.planets){
 		//console.log("object: " + object);
 		//Get the specific class/entity.
-		var obj = room.objects[object];
+		var obj = room.planets[object];
 		//console.log("obj: " + obj.status);
 		statuses.push(obj.status.planet);
 		//console.log("obj.status: " + obj);
@@ -123,11 +127,11 @@ function getAllStatsFromPlanets(room){
 function getCountdownMessage(room){
 	statuses = [];
 	//Object is all the objects in the object array in room "class".
-	for(object in room.objects){
-		var obj = room.objects[object];
+	for(object in room.countDownObject){
+		var obj = room.countDownObject[object];
 		if(obj.status.count){
-			if(room.objects.countdown){
-				room.objects.countdown.update(room);
+			if(room.countDownObject.countdown){
+				room.countDownObject.countdown.update(room);
 				//console.log(obj.status.count);
 				statuses.push(obj.status.count);
 			}
@@ -140,10 +144,10 @@ function getCountdownMessage(room){
 function getAllStatsFromPlanetsUpdate(room,createdAt){
 	statuses = [];
 	//Object is all the objects in the object array in room "class".
-	for(var object in room.objects){
+	for(var object in room.planets){
 		//console.log("object: " + object);
 		//Get the specific class/entity.
-		var obj = room.objects[object];
+		var obj = room.planets[object];
 		//console.log("obj: " + obj.status);
 		//Update all the classes with an update method and push all statuses in every object.
 		obj.update(room,createdAt);
@@ -159,12 +163,13 @@ function getAllStatsFromPlanetsUpdate(room,createdAt){
 function spawnShips(room){
 	statuses = [];
 	//Object is all the objects in the object array in room "class".
-	for(var object in room.objects){
+	for(var object in room.planets){
 		//console.log("object: " + object);
 		//Get the specific class/entity.
-		var obj = room.objects[object];
+		var obj = room.planets[object];
 		if(obj.spawnShips){
-			obj.spawnShips(room);
+			obj.spawnShips();
+			//console.log(obj.ships);
 		}
 		//console.log(obj.spawnShips);
 	}

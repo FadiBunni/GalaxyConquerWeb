@@ -4,6 +4,7 @@ const Ships = require("./ships.js");
 
 function playerPlanets(playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 	Baseobject.call(this);
+	this.ships = {};
 	this.playerid = playerid;
 	this.createdAt = Date.now();
 	this.side = side;
@@ -32,17 +33,23 @@ function playerPlanets(playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 		y:yPos
 	};
 
-	this.spawnShips = function(room){
-		for(var i = 0; i-planetScoreNumber / 2 < planetScoreNumber / 2; i++){
-			console.log(room.ships);
+	this.spawnShips = function(){
+		for(var i = 0; i< planetScoreNumber; i++){
+			this.ships[Object.keys(this.ships).length] = new Ships(Object.keys(this.ships).length,playerid,this.color,this,null);
+			planetScoreNumber--;
+			console.log(Object.keys(this.ships).length)
+			if(planetScoreNumber <= 0){
+				planetScoreNumber = 0;
+			}
 		}
 	};
 
 	this.update = function(room,createdAt){
-		var counter = Math.floor((Date.now()-createdAt)/1000);
-		//console.log(createdAt);
-		this.status.planet.planetScoreNumber = planetScoreNumber;
-		this.status.planet.planetScoreNumber += counter;
+		// var counter = Math.floor((Date.now()-createdAt)/1000);
+		// //console.log(createdAt);
+		// this.status.planet.planetScoreNumber = planetScoreNumber;
+		// this.status.planet.planetScoreNumber += counter;
+		//console.log(this.status.planet.planetScoreNumber);
 	};
 }
 
