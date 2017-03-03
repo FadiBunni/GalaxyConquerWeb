@@ -12,7 +12,7 @@ function Ships(id,playerid,color,startPlanet,endPlanet){
 	this.amoutOfAttack = 1;
 	speed = 2;
 	direction = 2;
-	startPlanet.planetScoreNumber-1;
+	startPlanet.status.planet.planetScoreNumber--;
 	spawnShipsAroundPlayerPlanets(startPlanet);
 
 	this.role = "Ship";
@@ -45,7 +45,7 @@ function moveShips(){
 function spawnShipsAroundPlayerPlanets (startPlanet){
 	const p = startPlanet;
 	const m = Math.random();
-	const centerX, centerY, radiusX, radiusY;
+	var centerX, centerY, radiusX, radiusY;
 	centerX = p.xPos + p.planetSize;
 	centerY = p.yPos + p.planetSize;
 	radiusX = p.planetSize;

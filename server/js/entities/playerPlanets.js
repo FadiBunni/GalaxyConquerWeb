@@ -34,22 +34,23 @@ function playerPlanets(playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 	};
 
 	this.spawnShips = function(){
-		for(var i = 0; i< planetScoreNumber; i++){
+		var planetScoreNumberHalf = this.status.planet.planetScoreNumber / 2; 
+		for(var i = 0; i < planetScoreNumberHalf; i++){
 			this.ships[Object.keys(this.ships).length] = new Ships(Object.keys(this.ships).length,playerid,this.color,this,null);
-			planetScoreNumber--;
-			console.log(Object.keys(this.ships).length)
-			if(planetScoreNumber <= 0){
-				planetScoreNumber = 0;
+			if(this.status.planet.planetScoreNumber <= 0){
+				this.status.planet.planetScoreNumber = 0;
 			}
+			planetScoreNumber = this.status.planet.planetScoreNumber;
 		}
+		console.log('playerid: ' + playerid);
+		console.log(Object.keys(this.ships).length)
 	};
 
 	this.update = function(room,createdAt){
-		// var counter = Math.floor((Date.now()-createdAt)/1000);
-		// //console.log(createdAt);
-		// this.status.planet.planetScoreNumber = planetScoreNumber;
-		// this.status.planet.planetScoreNumber += counter;
-		//console.log(this.status.planet.planetScoreNumber);
+		var counter = Math.floor((Date.now()-createdAt)/1000);
+		//console.log(createdAt);
+		this.status.planet.planetScoreNumber = planetScoreNumber;
+		this.status.planet.planetScoreNumber += counter;
 	};
 }
 

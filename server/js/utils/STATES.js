@@ -3,6 +3,7 @@ const SETTINGS = require('./SETTINGS.js');
 
 var statuses = [];
 var isSet = false;
+var issSet = true;
 var createdAt;
 var number = 1;
 
@@ -84,10 +85,9 @@ var playing = {
 		//console.log(statuses);
 		playing.io.to(room.id).emit('update', statuses);
 
-		if(number ===1)
-			console.log('hey')
+		if(issSet)
 			spawnShips(room);
-		number = 0;
+			issSet = false;
 
 		//playing.io.to(room.id).emit('update', statuses);
 
