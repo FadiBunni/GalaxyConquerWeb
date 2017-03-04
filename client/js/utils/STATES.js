@@ -253,9 +253,10 @@ var playing = {
   },
 
   loop: function(){
-    //clearBackground(params[4],params[7]);
+    clearBackground(params[4],params[7]);
     //params[6].emit('spawnShips');
     drawObjects(params[4],serverObjects);
+    drawShips(params[4],serverObjects)
     //Drawobjects.drawShips(params[4]);
     if(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6])){
       drawBorderAroundPlanet(params[5],serverObjects,params[6]);
@@ -357,8 +358,9 @@ var backToOpeningScene = {
   destroy: function(){}
 };
 
-module.exports = {start,waiting,ready,playing,backToOpeningScene,setServerObjects,setServerTimerMessage};
+module.exports = {start,waiting,ready,playing,backToOpeningScene,setServerPlanets,setServerTimerMessage,setServerShips};
 
+//draw objects
 function drawObjects(ctx,serverObjects){
   this.serverObjects = serverObjects;
   for(objects in serverObjects){
@@ -377,6 +379,15 @@ function drawTimerMessage(ctx, serverObjects){
   }
 }
 
+function drawShips(ctx,serverObjects){
+  this.serverObjects = serverObjects;
+  for(objects in serverObjects){
+    obj = serverObjects[objects];
+    Drawobjects.drawShips(ctx,obj);
+    //console.log(obj);
+  }
+}
+
 function drawBorderAroundPlanet(ctx,serverObjects,socket){
   this.serverObjects = serverObjects;
   for(objects in serverObjects){
@@ -386,7 +397,8 @@ function drawBorderAroundPlanet(ctx,serverObjects,socket){
   }
 }
 
-function setServerObjects(statuses){
+//setServerData
+function setServerPlanets(statuses){
   //serverObjects = [];
   this.statuses = statuses;
   for(status in statuses){
@@ -406,10 +418,23 @@ function setServerTimerMessage(statuses){
     if(stat.role === "countdown"){
       serverObjects.push(stat)
     }
-  };
+  }
   //console.log(serverObjects);
 }
 
+function setServerShips(statuses){
+  //serverObjects = [];
+  this.statuses = statuses;
+  for(status in statuses){
+    stat = statuses[status];
+    if(stat.role === "ship"){
+      serverObjects.push(stat)
+    }
+  }
+  //console.log(serverObjects);
+}
+
+//misc functions
 function clearBackground(ctx, GAME_SETTINGS){
   ctx.save();
   ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);

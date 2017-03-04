@@ -85,11 +85,12 @@ var playing = {
 		//console.log(statuses);
 		playing.io.to(room.id).emit('update', statuses);
 
-		if(issSet)
+		if(issSet){
 			spawnShips(room);
 			issSet = false;
-
-		//playing.io.to(room.id).emit('update', statuses);
+		}
+		var statuses = getAllStatsFromShips(room);
+		playing.io.to(room.id).emit('update', statuses);
 
 		//get statuses from all the objects in the room array, and send it to client
 		// if(room.status == "playing" && (room.planets[room.players[0].id].score>=SETTINGS.GOAL || room.planets[room.players[1].id].score>=SETTINGS.GOAL)){
@@ -161,20 +162,29 @@ function getAllStatsFromPlanetsUpdate(room,createdAt){
 }
 
 function spawnShips(room){
-	statuses = [];
 	//Object is all the objects in the object array in room "class".
 	for(var object in room.planets){
-		//console.log("object: " + object);
 		//Get the specific class/entity.
 		var obj = room.planets[object];
 		if(obj.spawnShips){
 			obj.spawnShips();
-			//console.log(obj.ships);
 		}
-		//console.log(obj.spawnShips);
 	}
-	//console.log(statuses);
-	return statuses;
 }
 
-function getAllStatsFromShips(room){}
+function getAllStatsFromShips(room){
+	for(var object in room.planets){
+		//Get the specific class/entity.
+		var obj = room.planets[object];
+		if(obj.spawnShips){
+			//get the ships array inside the given planets and push them in the statuses array
+			for(var ship in obj.ships){
+				var ship = obj.ships[ship];
+				ship.update(room);
+				statuses.push(ship.status.ship);
+				console.log(ship.status.ship);
+			}
+			return statuses;
+		}
+	}
+}

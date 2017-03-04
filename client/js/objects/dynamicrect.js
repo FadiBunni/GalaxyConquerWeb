@@ -37,8 +37,8 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 		if(e.type == 'mousedown'){
 		this.rect.startX = e.offsetX;
 		this.rect.startY = e.offsetY;
-		// console.log("rect_startX: " + this.rect.startX);
-		// console.log("rect_startY: " + this.rect.startY);
+		//console.log("rect_startX: " + this.rect.startX);
+		//console.log("rect_startY: " + this.rect.startY);
 		}
 		drag = true;
 	};

@@ -15,7 +15,7 @@ var drawObjects = {
 
   drawShips: function(ctx,status){
     switch(status.role){
-      case "Ships":
+      case "ship":
         drawShips(ctx,status);
         break;
     }
@@ -62,20 +62,19 @@ function drawTextOnPlanets(ctx,status){
 }
 
 function drawShips(ctx,status){
-  console.log("drawing!");
   //The triangle
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(100,100);
-  ctx.lineTo(100,300);
-  ctx.lineTo(150,300);
+  ctx.moveTo(status.xPos + (15*Math.cos(1)),status.yPos + (15*Math.sin(1)));
+  ctx.lineTo(status.xPos - (5*Math.sin(1)),status.yPos + (5*Math.cos(1)));
+  ctx.lineTo(status.xPos + (5*Math.sin(1)),status.yPos - (5*Math.cos(1)));
   ctx.closePath();
   //The outline
   ctx.lineWidth =1;
   ctx.strokeStyle = 'black';
   ctx.stroke();
   //the fill color
-  ctx.fillStyle = "#FFCC00";
+  ctx.fillStyle = status.color;
   ctx.fill();
   ctx.restore();
 }

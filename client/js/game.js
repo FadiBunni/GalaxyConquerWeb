@@ -32,13 +32,14 @@ socket.on('ready', function(){
 });
 
 socket.on('init', function(statuses){
-	STATES.setServerObjects(statuses);
-	//console.log(statuses);
+	STATES.setServerPlanets(statuses);
+	console.log(statuses);
 });
 
 socket.on('update', function(statuses){
 	STATES.setServerTimerMessage(statuses);
-	STATES.setServerObjects(statuses);
+	STATES.setServerPlanets(statuses);
+	STATES.setServerShips(statuses);
 	//console.log(statuses);
 });
 

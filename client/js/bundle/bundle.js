@@ -16,7 +16,7 @@ var drawObjects = {
 
   drawShips: function(ctx,status){
     switch(status.role){
-      case "Ships":
+      case "ship":
         drawShips(ctx,status);
         break;
     }
@@ -63,20 +63,19 @@ function drawTextOnPlanets(ctx,status){
 }
 
 function drawShips(ctx,status){
-  console.log("drawing!");
   //The triangle
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(100,100);
-  ctx.lineTo(100,300);
-  ctx.lineTo(150,300);
+  ctx.moveTo(status.xPos + (15*Math.cos(1)),status.yPos + (15*Math.sin(1)));
+  ctx.lineTo(status.xPos - (5*Math.sin(1)),status.yPos + (5*Math.cos(1)));
+  ctx.lineTo(status.xPos + (5*Math.sin(1)),status.yPos - (5*Math.cos(1)));
   ctx.closePath();
   //The outline
   ctx.lineWidth =1;
   ctx.strokeStyle = 'black';
   ctx.stroke();
   //the fill color
-  ctx.fillStyle = "#FFCC00";
+  ctx.fillStyle = status.color;
   ctx.fill();
   ctx.restore();
 }
@@ -149,13 +148,14 @@ socket.on('ready', function(){
 });
 
 socket.on('init', function(statuses){
-	STATES.setServerObjects(statuses);
-	//console.log(statuses);
+	STATES.setServerPlanets(statuses);
+	console.log(statuses);
 });
 
 socket.on('update', function(statuses){
 	STATES.setServerTimerMessage(statuses);
-	STATES.setServerObjects(statuses);
+	STATES.setServerPlanets(statuses);
+	STATES.setServerShips(statuses);
 	//console.log(statuses);
 });
 
@@ -300,8 +300,8 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 		if(e.type == 'mousedown'){
 		this.rect.startX = e.offsetX;
 		this.rect.startY = e.offsetY;
-		// console.log("rect_startX: " + this.rect.startX);
-		// console.log("rect_startY: " + this.rect.startY);
+		//console.log("rect_startX: " + this.rect.startX);
+		//console.log("rect_startY: " + this.rect.startY);
 		}
 		drag = true;
 	};
@@ -628,9 +628,10 @@ var playing = {
   },
 
   loop: function(){
-    //clearBackground(params[4],params[7]);
+    clearBackground(params[4],params[7]);
     //params[6].emit('spawnShips');
     drawObjects(params[4],serverObjects);
+    drawShips(params[4],serverObjects)
     //Drawobjects.drawShips(params[4]);
     if(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6])){
       drawBorderAroundPlanet(params[5],serverObjects,params[6]);
@@ -732,8 +733,9 @@ var backToOpeningScene = {
   destroy: function(){}
 };
 
-module.exports = {start,waiting,ready,playing,backToOpeningScene,setServerObjects,setServerTimerMessage};
+module.exports = {start,waiting,ready,playing,backToOpeningScene,setServerPlanets,setServerTimerMessage,setServerShips};
 
+//draw objects
 function drawObjects(ctx,serverObjects){
   this.serverObjects = serverObjects;
   for(objects in serverObjects){
@@ -752,6 +754,15 @@ function drawTimerMessage(ctx, serverObjects){
   }
 }
 
+function drawShips(ctx,serverObjects){
+  this.serverObjects = serverObjects;
+  for(objects in serverObjects){
+    obj = serverObjects[objects];
+    Drawobjects.drawShips(ctx,obj);
+    //console.log(obj);
+  }
+}
+
 function drawBorderAroundPlanet(ctx,serverObjects,socket){
   this.serverObjects = serverObjects;
   for(objects in serverObjects){
@@ -761,7 +772,8 @@ function drawBorderAroundPlanet(ctx,serverObjects,socket){
   }
 }
 
-function setServerObjects(statuses){
+//setServerData
+function setServerPlanets(statuses){
   //serverObjects = [];
   this.statuses = statuses;
   for(status in statuses){
@@ -781,10 +793,23 @@ function setServerTimerMessage(statuses){
     if(stat.role === "countdown"){
       serverObjects.push(stat)
     }
-  };
+  }
   //console.log(serverObjects);
 }
 
+function setServerShips(statuses){
+  //serverObjects = [];
+  this.statuses = statuses;
+  for(status in statuses){
+    stat = statuses[status];
+    if(stat.role === "ship"){
+      serverObjects.push(stat)
+    }
+  }
+  //console.log(serverObjects);
+}
+
+//misc functions
 function clearBackground(ctx, GAME_SETTINGS){
   ctx.save();
   ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
@@ -893,6 +918,9 @@ var Canvas = {
 	  console.log('Generating canvasDynamic.');
 
 	  var canvas = document.getElementById('canvasUI');
+	  canvas.oncontextmenu = function() {
+		return false;
+	  }
 	  var ctx = canvas.getContext('2d');
 	  // Pass our canvas' context to our getPixelRatio method
 	  var ratio = this.getPixelRatio(ctx);
