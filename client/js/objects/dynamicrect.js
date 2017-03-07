@@ -49,8 +49,13 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 			this.rect.h = e.offsetY - this.rect.startY;
 			// console.log("rectdragW: "+ this.rect.w)
 			// console.log("rectdragH: "+ this.rect.h)
+			//CLEARRECT SHOULD NOT BE HERE! IT MESSES WITH THE CIRCLES AND DRAWING!!!!!!! VERY IMPORTANT!
 			ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
 			this.draw();
+		}else if(e.type == 'mousemove') {
+			this.rect.startX = e.offsetX;
+			this.rect.startY = e.offsetY;
+			//ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
 		}
 	};
 

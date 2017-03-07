@@ -34,7 +34,7 @@ function playerPlanets(playerid,side,xPos,yPos,planetSize,planetScoreNumber){
 	};
 
 	this.spawnShips = function(){
-		var planetScoreNumberHalf = this.status.planet.planetScoreNumber*4;
+		var planetScoreNumberHalf = this.status.planet.planetScoreNumber/2;
 		for(var i = 0; i < planetScoreNumberHalf; i++){
 			this.ships[Object.keys(this.ships).length] = new Ships(Object.keys(this.ships).length,playerid,this.color,this,null);
 			if(this.status.planet.planetScoreNumber <= 0){

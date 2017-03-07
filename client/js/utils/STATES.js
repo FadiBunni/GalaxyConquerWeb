@@ -255,13 +255,21 @@ var playing = {
   loop: function(){
     clearBackground(params[4],params[7]);
     //params[6].emit('spawnShips');
-    drawObjects(params[4],serverObjects);
-    drawShips(params[4],serverObjects)
-    //Drawobjects.drawShips(params[4]);
-    if(planetDynamicRectIntersect(serverObjects,playing.dynamicrect1,params[6])){
-      drawBorderAroundPlanet(params[5],serverObjects,params[6]);
+    for(var objects in serverObjects){
+      var obj = serverObjects[objects];
+      Drawobjects.drawPlanets(params[4],obj);
+      Drawobjects.drawShips(params[4],obj);
+      if(obj.playerid === params[6].id){
+        if(planetDynamicRectIntersect(obj,playing.dynamicrect1)){
+          Drawobjects.drawStartPlanetBorder(params[5],obj,params[6]);
+        }
+      }
+      if(obj.role === "grayzonePlanet" || obj.role === "playerPlanet"){
+        if(planetMouseIntersect(obj,playing.dynamicrect1)){
+          Drawobjects.drawEndPlanetBorder(params[5],obj,params[6]);
+        }
+      }
     }
-
   },
 
   destroy: function(){
@@ -363,7 +371,7 @@ module.exports = {start,waiting,ready,playing,backToOpeningScene,setServerPlanet
 //draw objects
 function drawObjects(ctx,serverObjects){
   this.serverObjects = serverObjects;
-  for(objects in serverObjects){
+  for(var objects in serverObjects){
     obj = serverObjects[objects];
     Drawobjects.drawPlanets(ctx,obj);
     //console.log(obj);
@@ -372,27 +380,9 @@ function drawObjects(ctx,serverObjects){
 
 function drawTimerMessage(ctx, serverObjects){
   this.serverObjects = serverObjects;
-  for(objects in serverObjects){
+  for(var objects in serverObjects){
     obj = serverObjects[objects];
     Drawobjects.Timer(ctx,obj);
-    //console.log(obj);
-  }
-}
-
-function drawShips(ctx,serverObjects){
-  this.serverObjects = serverObjects;
-  for(objects in serverObjects){
-    obj = serverObjects[objects];
-    Drawobjects.drawShips(ctx,obj);
-    //console.log(obj);
-  }
-}
-
-function drawBorderAroundPlanet(ctx,serverObjects,socket){
-  this.serverObjects = serverObjects;
-  for(objects in serverObjects){
-    obj = serverObjects[objects];
-    Drawobjects.selectBorder(ctx,obj,socket);
     //console.log(obj);
   }
 }
@@ -401,7 +391,7 @@ function drawBorderAroundPlanet(ctx,serverObjects,socket){
 function setServerPlanets(statuses){
   //serverObjects = [];
   this.statuses = statuses;
-  for(status in statuses){
+  for(var status in statuses){
     stat = statuses[status];
     if(stat.role === "grayzonePlanet" || stat.role === "playerPlanet"){
       serverObjects.push(stat)
@@ -413,7 +403,7 @@ function setServerPlanets(statuses){
 function setServerTimerMessage(statuses){
   serverObjects = [];
   this.statuses = statuses;
-  for(status in statuses){
+  for(var status in statuses){
     stat = statuses[status];
     if(stat.role === "countdown"){
       serverObjects.push(stat)
@@ -425,7 +415,7 @@ function setServerTimerMessage(statuses){
 function setServerShips(statuses){
   //serverObjects = [];
   this.statuses = statuses;
-  for(status in statuses){
+  for(var status in statuses){
     stat = statuses[status];
     if(stat.role === "ship"){
       serverObjects.push(stat)
@@ -441,35 +431,41 @@ function clearBackground(ctx, GAME_SETTINGS){
   ctx.restore();
 }
 
-function planetDynamicRectIntersect(serverObjects,dynamicrect,socket){
+function planetDynamicRectIntersect(obj,dynamicrect){
   var rect = dynamicrect.rect;
-  for(objects in serverObjects){
-    var obj = serverObjects[objects];
-    if(obj.playerid === socket.id){
-      var circle = obj;
-      var distX  = Math.abs(circle.x - (rect.startX + rect.w / 2));
-      var distY  = Math.abs(circle.y - (rect.startY + rect.h / 2));
-      var absRectWidth = Math.abs(rect.w);
-      var absRectHeight = Math.abs(rect.h);
+  var circle = obj;
+  var distX  = Math.abs(circle.x - (rect.startX + rect.w / 2));
+  var distY  = Math.abs(circle.y - (rect.startY + rect.h / 2));
+  var absRectWidth = Math.abs(rect.w);
+  var absRectHeight = Math.abs(rect.h);
 
-      // console.log("circle.x: " + circle.x);
-      // console.log("circle.y: " + circle.y);
-      // console.log("rect.startX: " + rect.startX);
-      // console.log("rect.startY: " + rect.startY);
-      // console.log("rect.w: " + rect.w);
-      // console.log("rect.h: " + rect.h);
-      // console.log("distanceX" + distX);
-      // console.log("distanceY" + distY);
+  // console.log("circle.x: " + circle.x);
+  // console.log("circle.y: " + circle.y);
+  // console.log("rect.startX: " + rect.startX);
+  // console.log("rect.startY: " + rect.startY);
+  // console.log("rect.w: " + rect.w);
+  // console.log("rect.h: " + rect.h);
+  // console.log("distanceX" + distX);
+  // console.log("distanceY" + distY);
 
-      if(distX > (absRectWidth / 2 + circle.planetSize)){return false;}
-      if(distY > (absRectHeight / 2 + circle.planetSize)){return false;}
+  if(distX > (absRectWidth / 2 + circle.planetSize)){return false;}
+  if(distY > (absRectHeight / 2 + circle.planetSize)){return false;}
 
-      if(distX <= (absRectWidth / 2)){return true;}
-      if(distY <= (absRectHeight / 2)){return true;}
+  if(distX <= (absRectWidth / 2)){return true;}
+  if(distY <= (absRectHeight / 2)){return true;}
 
-      var dx = distX-absRectWidth/2;
-      var dy = distY-absRectHeight/2;
-      return (dx*dx+dy*dy <= (circle.planetSize*circle.planetSize));
-    }
-  }
+  var dx = distX-absRectWidth/2;
+  var dy = distY-absRectHeight/2;
+  return dx*dx+dy*dy <= (circle.planetSize*circle.planetSize);
 }
+
+function planetMouseIntersect(obj,dynamicrect){
+  var circle = obj;
+  var rect = dynamicrect.rect;
+  var dx = rect.startX - circle.x;
+  var dy = rect.startY - circle.y;
+  console.log("rect.startX: " + rect.startX);
+  console.log("rect.startY: " + rect.startY);
+  return dx*dx+dy*dy <= (circle.planetSize*circle.planetSize);
+}
+

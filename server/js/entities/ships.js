@@ -21,7 +21,7 @@ function Ships(id,playerid,color,startPlanet,endPlanet){
 		var centerX, centerY, radiusX, radiusY;
 		centerX = p.xPos;
 		centerY = p.yPos;
-		console.log(p.xPos);
+		//console.log(p.xPos);
 		radiusX = p.planetSize;
 		radiusY = p.planetSize;
 		xPos = (radiusX + 10) * (Math.cos(toRadians(Math.floor(m*360)))) + centerX;

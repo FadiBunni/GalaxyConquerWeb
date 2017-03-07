@@ -89,6 +89,7 @@ var playing = {
 			spawnShips(room);
 			issSet = false;
 		}
+
 		var statuses = getAllStatsFromShips(room);
 		playing.io.to(room.id).emit('update', statuses);
 
@@ -182,7 +183,7 @@ function getAllStatsFromShips(room){
 				var ship = obj.ships[ship];
 				ship.update(room);
 				statuses.push(ship.status.ship);
-				console.log(ship.status.ship);
+				//console.log(ship.status.ship);
 			}
 			return statuses;
 		}

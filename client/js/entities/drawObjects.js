@@ -21,13 +21,17 @@ var drawObjects = {
     }
   },
 
-  selectBorder: function(ctx,status,socket){
+  drawStartPlanetBorder: function(ctx,status,socket){
     switch (status.role){
       case "playerPlanet":
         //console.log('heeey');
-        drawBorderPlanet(ctx,status,socket);
+        drawStartPlanetBorder(ctx,status,socket);
         break;
     }
+  },
+
+  drawEndPlanetBorder: function(ctx,status,socket){
+    drawEndPlanetBorder(ctx,status,socket);
   },
 
   Timer: function(ctx,status){
@@ -79,14 +83,20 @@ function drawShips(ctx,status){
   ctx.restore();
 }
 
-function drawBorderPlanet(ctx,status,socket){
-  if(status.playerid === socket.id){;
+function drawStartPlanetBorder(ctx,status,socket){
     ctx.save();
     ctx.strokeStyle = 'white';
     ctx.beginPath();
     ctx.arc(status.x,status.y,status.planetSize+1,0,2*Math.PI);
     ctx.stroke();
-  }
+}
+
+function drawEndPlanetBorder(ctx,status,socket){
+    ctx.save();
+    ctx.strokeStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(status.x,status.y,status.planetSize+1,0,2*Math.PI);
+    ctx.stroke();
 }
 
 function drawTimerText(ctx, status){
