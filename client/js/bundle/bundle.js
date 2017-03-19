@@ -84,7 +84,7 @@ function drawShips(ctx,status){
   ctx.restore();
 }
 
-function drawStartPlanetBorder(ctx,status,socket){
+function drawStartPlanetBorder(ctx,status){
     ctx.save();
     ctx.strokeStyle = 'white';
     ctx.beginPath();
@@ -92,9 +92,13 @@ function drawStartPlanetBorder(ctx,status,socket){
     ctx.stroke();
 }
 
-function drawEndPlanetBorder(ctx,status,socket){
+function drawLineBetweenPlanets(ctx,status){
+
+}
+
+function drawEndPlanetBorder(ctx,status){
     ctx.save();
-    ctx.strokeStyle = 'white';
+    ctx.strokeStyle = 'blue';
     ctx.beginPath();
     ctx.arc(status.x,status.y,status.planetSize+1,0,2*Math.PI);
     ctx.stroke();
@@ -159,7 +163,7 @@ socket.on('ready', function(){
 
 socket.on('init', function(statuses){
 	STATES.setServerPlanets(statuses);
-	console.log(statuses);
+	//console.log(statuses);
 });
 
 socket.on('update', function(statuses){
@@ -271,12 +275,13 @@ function drawRect(ctx, rect){
   ctx.restore();
 }
 },{"./text.js":5}],4:[function(require,module,exports){
-function Dynamicrect(canvas,ctx,GAME_SETTINGS){
+function Mouseevent(canvas,ctx,GAME_SETTINGS){
 	this.canvas = canvas;
 	this.ctx = ctx;
 	this.GAME_SETTINGS = GAME_SETTINGS;
 	this.rect = {};
-	var drag = false;
+	this.mousehover = {}
+	this.drag = false;
 
 	this.initialize = function(){
 		if(this.setEvents){
@@ -288,12 +293,16 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 		rectObject = this;
 
 		$(canvas).on('mousedown',function(e){
-			// switch (event.which){
-			// 	case 1:
+			switch (event.which){
+				case 1:
 					rectObject.mouseDown(e);
-			// 		break;
-			// }
+					break;
+			}
 		});
+
+		// $(canvas).on('mouseover',function(e){
+  //  			rectObject.mouseOver(e);
+  //  		});
 
 		$(canvas).on('mousemove',function(e){
       		rectObject.mouseMove(e);
@@ -313,37 +322,42 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 		//console.log("rect_startX: " + this.rect.startX);
 		//console.log("rect_startY: " + this.rect.startY);
 		}
-		drag = true;
+		this.drag = true;
 	};
 
 	this.mouseMove = function(e){
-		if(drag && e.type == 'mousemove'){
+		if(this.drag && e.type == 'mousemove'){
 			this.rect.w = e.offsetX - this.rect.startX;
 			this.rect.h = e.offsetY - this.rect.startY;
-			// console.log("rectdragW: "+ this.rect.w)
-			// console.log("rectdragH: "+ this.rect.h)
-			//CLEARRECT SHOULD NOT BE HERE! IT MESSES WITH THE CIRCLES AND DRAWING!!!!!!! VERY IMPORTANT!
-			ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-			this.draw();
-		}else if(e.type == 'mousemove') {
-			this.rect.startX = e.offsetX;
-			this.rect.startY = e.offsetY;
-			//ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+			console.log("rectdragW: "+ this.rect.w)
+			console.log("rectdragH: "+ this.rect.h)
+		}else{
+			this.mousehover.startX = e.offsetX;
+			this.mousehover.startY = e.offsetY;
+			// console.log("mousehoverStartX: "+ this.mousehover.startX);
+			// console.log("mousehoverStartY: "+ this.mousehover.startY);
 		}
 	};
 
+	this.mouseOver =function(e){
+		this.rect.startX = e.offsetX;
+		this.rect.startY = e.offsetY;
+	}
+
 	this.mouseUp = function(){
 		ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-		drag = false;
+		this.drag = false;
 	};
 
 	this.draw = function(){
+		//CLEARRECT SHOULD NOT BE HERE! IT MESSES WITH THE CIRCLES AND DRAWING!!!!!!! VERY IMPORTANT!
+		ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
 		ctx.strokeStyle = '#000000';
 		ctx.strokeRect(this.rect.startX, this.rect.startY, this.rect.w, this.rect.h);
 	};
 }
 
-module.exports = Dynamicrect;
+module.exports = Mouseevent;
 },{}],5:[function(require,module,exports){
 function Text(){
 	this.initialize = function(canvas,ctx,GAME_SETTINGS,data){
@@ -392,11 +406,12 @@ const Drawobjects = require('../entities/drawObjects.js');
 const Img    = require('./imgimport.js');
 const Button = require('../objects/button.js');
 const Text   = require('../objects/text.js');
-const Dynamicrect = require('../objects/dynamicrect.js');
+const Mouseevent  = require('../objects/mouseevent.js')
 const INTERVAL = 20;
 
 var params = [];
 var serverObjects = [];
+var isStartPlanetSelected = false;
 
 var mainLoop = function(){};
 function theLoop(){
@@ -631,13 +646,14 @@ var ready = {
 var playing = {
   misc: function(canvasUI,ctxU,GAME_SETTINGS){
     var self = this;
-    self.dynamicrect1 = new Dynamicrect(canvasUI,ctxU,GAME_SETTINGS);
+    self.mouseevent1 = new Mouseevent(canvasUI,ctxU,GAME_SETTINGS);
   },
 
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     this.misc(canvasUI,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-    playing.dynamicrect1.initialize();
+    playing.mouseevent1.initialize();
+
 
     mainLoop = playing.loop;
   },
@@ -645,19 +661,24 @@ var playing = {
   loop: function(){
     clearBackground(params[4],params[7]);
     //params[6].emit('spawnShips');
+    if(playing.mouseevent1.drag){
+      playing.mouseevent1.draw();
+    }
     for(var objects in serverObjects){
       var obj = serverObjects[objects];
       Drawobjects.drawPlanets(params[4],obj);
       Drawobjects.drawShips(params[4],obj);
       if(obj.playerid === params[6].id){
-        if(planetDynamicRectIntersect(obj,playing.dynamicrect1)){
-          Drawobjects.drawStartPlanetBorder(params[5],obj,params[6]);
+        if(planetDynamicRectIntersect(obj,playing.mouseevent1)){
+          Drawobjects.drawStartPlanetBorder(params[4],obj,params[6]);
+          isStartPlanetSelected = true;
+        }else{
+          isStartPlanetSelected = false;
         }
       }
-      if(obj.role === "grayzonePlanet" || obj.role === "playerPlanet"){
-        if(planetMouseIntersect(obj,playing.dynamicrect1)){
-          Drawobjects.drawEndPlanetBorder(params[5],obj,params[6]);
-        }
+      if(isStartPlanetSelected && planetMouseIntersect(obj,playing.mouseevent1) && obj.role === "grayzonePlanet"){
+          Drawobjects.drawEndPlanetBorder(params[4],obj,params[6]);
+          //if(clicked on planet send ship!)
       }
     }
   },
@@ -849,18 +870,18 @@ function planetDynamicRectIntersect(obj,dynamicrect){
   return dx*dx+dy*dy <= (circle.planetSize*circle.planetSize);
 }
 
-function planetMouseIntersect(obj,dynamicrect){
+function planetMouseIntersect(obj,mouseevent){
   var circle = obj;
-  var rect = dynamicrect.rect;
-  var dx = rect.startX - circle.x;
-  var dy = rect.startY - circle.y;
-  console.log("rect.startX: " + rect.startX);
-  console.log("rect.startY: " + rect.startY);
+  var mousehover = mouseevent.mousehover;
+  var dx = mousehover.startX - circle.x;
+  var dy = mousehover.startY - circle.y;
+  // console.log("mousehoverStartX: " + mousehover.startX);
+  // console.log("mousehoverStartY: " + mousehover.startY);
   return dx*dx+dy*dy <= (circle.planetSize*circle.planetSize);
 }
 
 
-},{"../entities/drawObjects.js":1,"../objects/button.js":3,"../objects/dynamicrect.js":4,"../objects/text.js":5,"./imgimport.js":8}],7:[function(require,module,exports){
+},{"../entities/drawObjects.js":1,"../objects/button.js":3,"../objects/mouseevent.js":4,"../objects/text.js":5,"./imgimport.js":8}],7:[function(require,module,exports){
 var Canvas = {
 	getPixelRatio : function getPixelRatio(ctx) {
 	  console.log('Determining pixel ratio.');

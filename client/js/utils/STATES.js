@@ -2,11 +2,12 @@ const Drawobjects = require('../entities/drawObjects.js');
 const Img    = require('./imgimport.js');
 const Button = require('../objects/button.js');
 const Text   = require('../objects/text.js');
-const Dynamicrect = require('../objects/dynamicrect.js');
+const Mouseevent  = require('../objects/mouseevent.js')
 const INTERVAL = 20;
 
 var params = [];
 var serverObjects = [];
+var isStartPlanetSelected = false;
 
 var mainLoop = function(){};
 function theLoop(){
@@ -241,13 +242,14 @@ var ready = {
 var playing = {
   misc: function(canvasUI,ctxU,GAME_SETTINGS){
     var self = this;
-    self.dynamicrect1 = new Dynamicrect(canvasUI,ctxU,GAME_SETTINGS);
+    self.mouseevent1 = new Mouseevent(canvasUI,ctxU,GAME_SETTINGS);
   },
 
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     this.misc(canvasUI,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-    playing.dynamicrect1.initialize();
+    playing.mouseevent1.initialize();
+
 
     mainLoop = playing.loop;
   },
@@ -255,19 +257,24 @@ var playing = {
   loop: function(){
     clearBackground(params[4],params[7]);
     //params[6].emit('spawnShips');
+    if(playing.mouseevent1.drag){
+      playing.mouseevent1.draw();
+    }
     for(var objects in serverObjects){
       var obj = serverObjects[objects];
       Drawobjects.drawPlanets(params[4],obj);
       Drawobjects.drawShips(params[4],obj);
       if(obj.playerid === params[6].id){
-        if(planetDynamicRectIntersect(obj,playing.dynamicrect1)){
-          Drawobjects.drawStartPlanetBorder(params[5],obj,params[6]);
+        if(planetDynamicRectIntersect(obj,playing.mouseevent1)){
+          Drawobjects.drawStartPlanetBorder(params[4],obj,params[6]);
+          isStartPlanetSelected = true;
+        }else{
+          isStartPlanetSelected = false;
         }
       }
-      if(obj.role === "grayzonePlanet" || obj.role === "playerPlanet"){
-        if(planetMouseIntersect(obj,playing.dynamicrect1)){
-          Drawobjects.drawEndPlanetBorder(params[5],obj,params[6]);
-        }
+      if(isStartPlanetSelected && planetMouseIntersect(obj,playing.mouseevent1) && obj.role === "grayzonePlanet"){
+          Drawobjects.drawEndPlanetBorder(params[4],obj,params[6]);
+          //if(clicked on planet send ship!)
       }
     }
   },
@@ -459,13 +466,13 @@ function planetDynamicRectIntersect(obj,dynamicrect){
   return dx*dx+dy*dy <= (circle.planetSize*circle.planetSize);
 }
 
-function planetMouseIntersect(obj,dynamicrect){
+function planetMouseIntersect(obj,mouseevent){
   var circle = obj;
-  var rect = dynamicrect.rect;
-  var dx = rect.startX - circle.x;
-  var dy = rect.startY - circle.y;
-  console.log("rect.startX: " + rect.startX);
-  console.log("rect.startY: " + rect.startY);
+  var mousehover = mouseevent.mousehover;
+  var dx = mousehover.startX - circle.x;
+  var dy = mousehover.startY - circle.y;
+  // console.log("mousehoverStartX: " + mousehover.startX);
+  // console.log("mousehoverStartY: " + mousehover.startY);
   return dx*dx+dy*dy <= (circle.planetSize*circle.planetSize);
 }
 

@@ -33,7 +33,7 @@ socket.on('ready', function(){
 
 socket.on('init', function(statuses){
 	STATES.setServerPlanets(statuses);
-	console.log(statuses);
+	//console.log(statuses);
 });
 
 socket.on('update', function(statuses){

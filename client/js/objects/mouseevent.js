@@ -1,9 +1,10 @@
-function Dynamicrect(canvas,ctx,GAME_SETTINGS){
+function Mouseevent(canvas,ctx,GAME_SETTINGS){
 	this.canvas = canvas;
 	this.ctx = ctx;
 	this.GAME_SETTINGS = GAME_SETTINGS;
 	this.rect = {};
-	var drag = false;
+	this.mousehover = {}
+	this.drag = false;
 
 	this.initialize = function(){
 		if(this.setEvents){
@@ -15,12 +16,16 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 		rectObject = this;
 
 		$(canvas).on('mousedown',function(e){
-			// switch (event.which){
-			// 	case 1:
+			switch (event.which){
+				case 1:
 					rectObject.mouseDown(e);
-			// 		break;
-			// }
+					break;
+			}
 		});
+
+		// $(canvas).on('mouseover',function(e){
+  //  			rectObject.mouseOver(e);
+  //  		});
 
 		$(canvas).on('mousemove',function(e){
       		rectObject.mouseMove(e);
@@ -40,34 +45,39 @@ function Dynamicrect(canvas,ctx,GAME_SETTINGS){
 		//console.log("rect_startX: " + this.rect.startX);
 		//console.log("rect_startY: " + this.rect.startY);
 		}
-		drag = true;
+		this.drag = true;
 	};
 
 	this.mouseMove = function(e){
-		if(drag && e.type == 'mousemove'){
+		if(this.drag && e.type == 'mousemove'){
 			this.rect.w = e.offsetX - this.rect.startX;
 			this.rect.h = e.offsetY - this.rect.startY;
-			// console.log("rectdragW: "+ this.rect.w)
-			// console.log("rectdragH: "+ this.rect.h)
-			//CLEARRECT SHOULD NOT BE HERE! IT MESSES WITH THE CIRCLES AND DRAWING!!!!!!! VERY IMPORTANT!
-			ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-			this.draw();
-		}else if(e.type == 'mousemove') {
-			this.rect.startX = e.offsetX;
-			this.rect.startY = e.offsetY;
-			//ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+			console.log("rectdragW: "+ this.rect.w)
+			console.log("rectdragH: "+ this.rect.h)
+		}else{
+			this.mousehover.startX = e.offsetX;
+			this.mousehover.startY = e.offsetY;
+			// console.log("mousehoverStartX: "+ this.mousehover.startX);
+			// console.log("mousehoverStartY: "+ this.mousehover.startY);
 		}
 	};
 
+	this.mouseOver =function(e){
+		this.rect.startX = e.offsetX;
+		this.rect.startY = e.offsetY;
+	}
+
 	this.mouseUp = function(){
 		ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-		drag = false;
+		this.drag = false;
 	};
 
 	this.draw = function(){
+		//CLEARRECT SHOULD NOT BE HERE! IT MESSES WITH THE CIRCLES AND DRAWING!!!!!!! VERY IMPORTANT!
+		ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
 		ctx.strokeStyle = '#000000';
 		ctx.strokeRect(this.rect.startX, this.rect.startY, this.rect.w, this.rect.h);
 	};
 }
 
-module.exports = Dynamicrect;
+module.exports = Mouseevent;

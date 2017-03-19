@@ -83,7 +83,7 @@ function drawShips(ctx,status){
   ctx.restore();
 }
 
-function drawStartPlanetBorder(ctx,status,socket){
+function drawStartPlanetBorder(ctx,status){
     ctx.save();
     ctx.strokeStyle = 'white';
     ctx.beginPath();
@@ -91,9 +91,13 @@ function drawStartPlanetBorder(ctx,status,socket){
     ctx.stroke();
 }
 
-function drawEndPlanetBorder(ctx,status,socket){
+function drawLineBetweenPlanets(ctx,status){
+
+}
+
+function drawEndPlanetBorder(ctx,status){
     ctx.save();
-    ctx.strokeStyle = 'white';
+    ctx.strokeStyle = 'blue';
     ctx.beginPath();
     ctx.arc(status.x,status.y,status.planetSize+1,0,2*Math.PI);
     ctx.stroke();
