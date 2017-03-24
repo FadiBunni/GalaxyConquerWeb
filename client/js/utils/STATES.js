@@ -266,9 +266,7 @@ var playing = {
 
     for(var objectPlanet in serverPlanets){
       var objP = serverPlanets[objectPlanet];
-
       Drawobjects.drawPlanets(params[4],objP);
-      //console.log(obj.playerid);
       if(objP.playerid === params[6].id){
         if(planetDynamicRectIntersect(objP,playing.mouseevent1)){
           Drawobjects.drawStartPlanetBorder(params[4],objP);
@@ -279,6 +277,7 @@ var playing = {
         }
       }
     }
+
     if(!playing.mouseevent1.drag && isStartPlanetSelected){
       for(var objectPlanet in serverPlanets){
         var objP = serverPlanets[objectPlanet];
@@ -289,6 +288,7 @@ var playing = {
         }
       }
     }
+
     for(var objectShip in serverShips){
       var objS = serverShips[objectShip];
       Drawobjects.drawShips(params[4],objS);
@@ -296,9 +296,7 @@ var playing = {
     }
   },
 
-  destroy: function(){
-
-  }
+  destroy: function(){}
 };
 
 var backToOpeningScene = {
