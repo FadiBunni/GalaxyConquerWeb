@@ -21,17 +21,17 @@ var drawObjects = {
     }
   },
 
-  drawStartPlanetBorder: function(ctx,status,socket){
+  drawStartPlanetBorder: function(ctx,status){
     switch (status.role){
       case "playerPlanet":
         //console.log('heeey');
-        drawStartPlanetBorder(ctx,status,socket);
+        drawStartPlanetBorder(ctx,status);
         break;
     }
   },
 
-  drawEndPlanetBorder: function(ctx,status,socket){
-    drawEndPlanetBorder(ctx,status,socket);
+  drawEndPlanetBorder: function(ctx,currentstatus,status,socket){
+    drawEndPlanetBorder(ctx,currentstatus,status,socket);
   },
 
   Timer: function(ctx,status){
@@ -87,20 +87,33 @@ function drawStartPlanetBorder(ctx,status){
     ctx.save();
     ctx.strokeStyle = 'white';
     ctx.beginPath();
+    ctx.lineWidth = 4;
     ctx.arc(status.x,status.y,status.planetSize+1,0,2*Math.PI);
     ctx.stroke();
 }
 
-function drawLineBetweenPlanets(ctx,status){
+function drawLineBetweenPlanets(ctx,currentstatus,status,socket){
+  ctx.beginPath();
+  ctx.lineWidth="5";
+  ctx.strokeStyle="white";
+  ctx.moveTo(status.x,status.y);
+  console.log(status.x);
+  ctx.lineTo(currentstatus.x,currentstatus.y);
+  console.log(currentstatus.x);
+  ctx.stroke();
 
 }
 
-function drawEndPlanetBorder(ctx,status){
+function drawEndPlanetBorder(ctx,currentstatus,status,socket){
+
+    //console.log(status);
     ctx.save();
     ctx.strokeStyle = 'blue';
     ctx.beginPath();
-    ctx.arc(status.x,status.y,status.planetSize+1,0,2*Math.PI);
+    ctx.lineWidth = 4;
+    ctx.arc(status.x,status.y,status.planetSize+3,0,2*Math.PI);
     ctx.stroke();
+    drawLineBetweenPlanets(ctx,currentstatus,status,socket);
 }
 
 function drawTimerText(ctx, status){

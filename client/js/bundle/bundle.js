@@ -22,17 +22,17 @@ var drawObjects = {
     }
   },
 
-  drawStartPlanetBorder: function(ctx,status,socket){
+  drawStartPlanetBorder: function(ctx,status){
     switch (status.role){
       case "playerPlanet":
         //console.log('heeey');
-        drawStartPlanetBorder(ctx,status,socket);
+        drawStartPlanetBorder(ctx,status);
         break;
     }
   },
 
-  drawEndPlanetBorder: function(ctx,status,socket){
-    drawEndPlanetBorder(ctx,status,socket);
+  drawEndPlanetBorder: function(ctx,currentstatus,status,socket){
+    drawEndPlanetBorder(ctx,currentstatus,status,socket);
   },
 
   Timer: function(ctx,status){
@@ -88,20 +88,33 @@ function drawStartPlanetBorder(ctx,status){
     ctx.save();
     ctx.strokeStyle = 'white';
     ctx.beginPath();
+    ctx.lineWidth = 4;
     ctx.arc(status.x,status.y,status.planetSize+1,0,2*Math.PI);
     ctx.stroke();
 }
 
-function drawLineBetweenPlanets(ctx,status){
+function drawLineBetweenPlanets(ctx,currentstatus,status,socket){
+  ctx.beginPath();
+  ctx.lineWidth="5";
+  ctx.strokeStyle="white";
+  ctx.moveTo(status.x,status.y);
+  console.log(status.x);
+  ctx.lineTo(currentstatus.x,currentstatus.y);
+  console.log(currentstatus.x);
+  ctx.stroke();
 
 }
 
-function drawEndPlanetBorder(ctx,status){
+function drawEndPlanetBorder(ctx,currentstatus,status,socket){
+
+    //console.log(status);
     ctx.save();
     ctx.strokeStyle = 'blue';
     ctx.beginPath();
-    ctx.arc(status.x,status.y,status.planetSize+1,0,2*Math.PI);
+    ctx.lineWidth = 4;
+    ctx.arc(status.x,status.y,status.planetSize+3,0,2*Math.PI);
     ctx.stroke();
+    drawLineBetweenPlanets(ctx,currentstatus,status,socket);
 }
 
 function drawTimerText(ctx, status){
@@ -300,10 +313,6 @@ function Mouseevent(canvas,ctx,GAME_SETTINGS){
 			}
 		});
 
-		// $(canvas).on('mouseover',function(e){
-  //  			rectObject.mouseOver(e);
-  //  		});
-
 		$(canvas).on('mousemove',function(e){
       		rectObject.mouseMove(e);
    		});
@@ -329,8 +338,8 @@ function Mouseevent(canvas,ctx,GAME_SETTINGS){
 		if(this.drag && e.type == 'mousemove'){
 			this.rect.w = e.offsetX - this.rect.startX;
 			this.rect.h = e.offsetY - this.rect.startY;
-			console.log("rectdragW: "+ this.rect.w)
-			console.log("rectdragH: "+ this.rect.h)
+			// console.log("rectdragW: "+ this.rect.w)
+			// console.log("rectdragH: "+ this.rect.h)
 		}else{
 			this.mousehover.startX = e.offsetX;
 			this.mousehover.startY = e.offsetY;
@@ -338,11 +347,6 @@ function Mouseevent(canvas,ctx,GAME_SETTINGS){
 			// console.log("mousehoverStartY: "+ this.mousehover.startY);
 		}
 	};
-
-	this.mouseOver =function(e){
-		this.rect.startX = e.offsetX;
-		this.rect.startY = e.offsetY;
-	}
 
 	this.mouseUp = function(){
 		ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
@@ -410,7 +414,10 @@ const Mouseevent  = require('../objects/mouseevent.js')
 const INTERVAL = 20;
 
 var params = [];
-var serverObjects = [];
+var serverPlanets = [];
+var serverShips = [];
+var serverTimers = [];
+var currentPlanets;
 var isStartPlanetSelected = false;
 
 var mainLoop = function(){};
@@ -554,7 +561,7 @@ var ready = {
     self.button1.click = function(){
       //set player to be ready.
       ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-      drawObjects(ctxD,serverObjects);
+      drawObjects(ctxD,serverPlanets);
       ready.text1.data.text.message = "The game will start when your apponent is ready";
       delete ready.button1.data;
       ready.destroy();
@@ -574,8 +581,8 @@ var ready = {
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     this.misc(socket,ctxD,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+    drawObjects(ctxD,serverPlanets);
 
-    drawObjects(ctxD,serverObjects);
     ready.text1.initialize(canvasUI,ctxU,GAME_SETTINGS,{
       text:{
         x: GAME_SETTINGS.WIDTH/2,
@@ -631,7 +638,7 @@ var ready = {
   },
 
   loop: function(){
-    drawTimerMessage(params[5],serverObjects);
+    drawTimerMessage(params[5],serverTimers);
     if(ready.button1.data){
       ready.button1.update();
       ready.button1.draw();
@@ -664,22 +671,36 @@ var playing = {
     if(playing.mouseevent1.drag){
       playing.mouseevent1.draw();
     }
-    for(var objects in serverObjects){
-      var obj = serverObjects[objects];
-      Drawobjects.drawPlanets(params[4],obj);
-      Drawobjects.drawShips(params[4],obj);
-      if(obj.playerid === params[6].id){
-        if(planetDynamicRectIntersect(obj,playing.mouseevent1)){
-          Drawobjects.drawStartPlanetBorder(params[4],obj,params[6]);
+
+    for(var objectPlanet in serverPlanets){
+      var objP = serverPlanets[objectPlanet];
+
+      Drawobjects.drawPlanets(params[4],objP);
+      //console.log(obj.playerid);
+      if(objP.playerid === params[6].id){
+        if(planetDynamicRectIntersect(objP,playing.mouseevent1)){
+          Drawobjects.drawStartPlanetBorder(params[4],objP);
+          currentPlanets = objP;
           isStartPlanetSelected = true;
         }else{
           isStartPlanetSelected = false;
         }
       }
-      if(isStartPlanetSelected && planetMouseIntersect(obj,playing.mouseevent1) && obj.role === "grayzonePlanet"){
-          Drawobjects.drawEndPlanetBorder(params[4],obj,params[6]);
-          //if(clicked on planet send ship!)
+    }
+    if(!playing.mouseevent1.drag && isStartPlanetSelected){
+      for(var objectPlanet in serverPlanets){
+        var objP = serverPlanets[objectPlanet];
+        if(planetMouseIntersect(objP,playing.mouseevent1)){
+          console.log(currentPlanets)
+          Drawobjects.drawEndPlanetBorder(params[4],currentPlanets,objP,params[6]);
+            //if(clicked on planet send ship!)
+        }
       }
+    }
+    for(var objectShip in serverShips){
+      var objS = serverShips[objectShip];
+      Drawobjects.drawShips(params[4],objS);
+      //console.log(objS);
     }
   },
 
@@ -800,39 +821,37 @@ function drawTimerMessage(ctx, serverObjects){
 
 //setServerData
 function setServerPlanets(statuses){
-  //serverObjects = [];
+  serverPlanets = [];
   this.statuses = statuses;
   for(var status in statuses){
     stat = statuses[status];
     if(stat.role === "grayzonePlanet" || stat.role === "playerPlanet"){
-      serverObjects.push(stat)
+      serverPlanets.push(stat)
     }
   }
-  //console.log(serverObjects);
+  //console.log(serverPlanets);
 }
 
 function setServerTimerMessage(statuses){
-  serverObjects = [];
+  serverTimers = [];
   this.statuses = statuses;
   for(var status in statuses){
     stat = statuses[status];
-    if(stat.role === "countdown"){
-      serverObjects.push(stat)
+    serverTimers.push(stat)
     }
-  }
-  //console.log(serverObjects);
+  //console.log(serverTimer);
 }
 
 function setServerShips(statuses){
-  //serverObjects = [];
+  serverShips= [];
   this.statuses = statuses;
   for(var status in statuses){
     stat = statuses[status];
     if(stat.role === "ship"){
-      serverObjects.push(stat)
+      serverShips.push(stat)
     }
   }
-  //console.log(serverObjects);
+  //console.log(serverShips);
 }
 
 //misc functions

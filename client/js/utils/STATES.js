@@ -6,7 +6,10 @@ const Mouseevent  = require('../objects/mouseevent.js')
 const INTERVAL = 20;
 
 var params = [];
-var serverObjects = [];
+var serverPlanets = [];
+var serverShips = [];
+var serverTimers = [];
+var currentPlanets;
 var isStartPlanetSelected = false;
 
 var mainLoop = function(){};
@@ -150,7 +153,7 @@ var ready = {
     self.button1.click = function(){
       //set player to be ready.
       ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
-      drawObjects(ctxD,serverObjects);
+      drawObjects(ctxD,serverPlanets);
       ready.text1.data.text.message = "The game will start when your apponent is ready";
       delete ready.button1.data;
       ready.destroy();
@@ -170,8 +173,8 @@ var ready = {
   initialize: function(canvasStatic,canvasDynamic,canvasUI,ctxS,ctxD,ctxU,socket,GAME_SETTINGS){
     this.misc(socket,ctxD,ctxU,GAME_SETTINGS);
     ctxU.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
+    drawObjects(ctxD,serverPlanets);
 
-    drawObjects(ctxD,serverObjects);
     ready.text1.initialize(canvasUI,ctxU,GAME_SETTINGS,{
       text:{
         x: GAME_SETTINGS.WIDTH/2,
@@ -227,7 +230,7 @@ var ready = {
   },
 
   loop: function(){
-    drawTimerMessage(params[5],serverObjects);
+    drawTimerMessage(params[5],serverTimers);
     if(ready.button1.data){
       ready.button1.update();
       ready.button1.draw();
@@ -260,22 +263,36 @@ var playing = {
     if(playing.mouseevent1.drag){
       playing.mouseevent1.draw();
     }
-    for(var objects in serverObjects){
-      var obj = serverObjects[objects];
-      Drawobjects.drawPlanets(params[4],obj);
-      Drawobjects.drawShips(params[4],obj);
-      if(obj.playerid === params[6].id){
-        if(planetDynamicRectIntersect(obj,playing.mouseevent1)){
-          Drawobjects.drawStartPlanetBorder(params[4],obj,params[6]);
+
+    for(var objectPlanet in serverPlanets){
+      var objP = serverPlanets[objectPlanet];
+
+      Drawobjects.drawPlanets(params[4],objP);
+      //console.log(obj.playerid);
+      if(objP.playerid === params[6].id){
+        if(planetDynamicRectIntersect(objP,playing.mouseevent1)){
+          Drawobjects.drawStartPlanetBorder(params[4],objP);
+          currentPlanets = objP;
           isStartPlanetSelected = true;
         }else{
           isStartPlanetSelected = false;
         }
       }
-      if(isStartPlanetSelected && planetMouseIntersect(obj,playing.mouseevent1) && obj.role === "grayzonePlanet"){
-          Drawobjects.drawEndPlanetBorder(params[4],obj,params[6]);
-          //if(clicked on planet send ship!)
+    }
+    if(!playing.mouseevent1.drag && isStartPlanetSelected){
+      for(var objectPlanet in serverPlanets){
+        var objP = serverPlanets[objectPlanet];
+        if(planetMouseIntersect(objP,playing.mouseevent1)){
+          console.log(currentPlanets)
+          Drawobjects.drawEndPlanetBorder(params[4],currentPlanets,objP,params[6]);
+            //if(clicked on planet send ship!)
+        }
       }
+    }
+    for(var objectShip in serverShips){
+      var objS = serverShips[objectShip];
+      Drawobjects.drawShips(params[4],objS);
+      //console.log(objS);
     }
   },
 
@@ -396,39 +413,37 @@ function drawTimerMessage(ctx, serverObjects){
 
 //setServerData
 function setServerPlanets(statuses){
-  //serverObjects = [];
+  serverPlanets = [];
   this.statuses = statuses;
   for(var status in statuses){
     stat = statuses[status];
     if(stat.role === "grayzonePlanet" || stat.role === "playerPlanet"){
-      serverObjects.push(stat)
+      serverPlanets.push(stat)
     }
   }
-  //console.log(serverObjects);
+  //console.log(serverPlanets);
 }
 
 function setServerTimerMessage(statuses){
-  serverObjects = [];
+  serverTimers = [];
   this.statuses = statuses;
   for(var status in statuses){
     stat = statuses[status];
-    if(stat.role === "countdown"){
-      serverObjects.push(stat)
+    serverTimers.push(stat)
     }
-  }
-  //console.log(serverObjects);
+  //console.log(serverTimer);
 }
 
 function setServerShips(statuses){
-  //serverObjects = [];
+  serverShips= [];
   this.statuses = statuses;
   for(var status in statuses){
     stat = statuses[status];
     if(stat.role === "ship"){
-      serverObjects.push(stat)
+      serverShips.push(stat)
     }
   }
-  //console.log(serverObjects);
+  //console.log(serverShips);
 }
 
 //misc functions

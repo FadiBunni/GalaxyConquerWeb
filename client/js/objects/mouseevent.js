@@ -23,10 +23,6 @@ function Mouseevent(canvas,ctx,GAME_SETTINGS){
 			}
 		});
 
-		// $(canvas).on('mouseover',function(e){
-  //  			rectObject.mouseOver(e);
-  //  		});
-
 		$(canvas).on('mousemove',function(e){
       		rectObject.mouseMove(e);
    		});
@@ -52,8 +48,8 @@ function Mouseevent(canvas,ctx,GAME_SETTINGS){
 		if(this.drag && e.type == 'mousemove'){
 			this.rect.w = e.offsetX - this.rect.startX;
 			this.rect.h = e.offsetY - this.rect.startY;
-			console.log("rectdragW: "+ this.rect.w)
-			console.log("rectdragH: "+ this.rect.h)
+			// console.log("rectdragW: "+ this.rect.w)
+			// console.log("rectdragH: "+ this.rect.h)
 		}else{
 			this.mousehover.startX = e.offsetX;
 			this.mousehover.startY = e.offsetY;
@@ -61,11 +57,6 @@ function Mouseevent(canvas,ctx,GAME_SETTINGS){
 			// console.log("mousehoverStartY: "+ this.mousehover.startY);
 		}
 	};
-
-	this.mouseOver =function(e){
-		this.rect.startX = e.offsetX;
-		this.rect.startY = e.offsetY;
-	}
 
 	this.mouseUp = function(){
 		ctx.clearRect(0,0,GAME_SETTINGS.WIDTH,GAME_SETTINGS.HEIGHT);
