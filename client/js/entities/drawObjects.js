@@ -97,9 +97,9 @@ function drawLineBetweenPlanets(ctx,currentstatus,status,socket){
   ctx.lineWidth="5";
   ctx.strokeStyle="white";
   ctx.moveTo(status.x,status.y);
-  console.log(status.x);
+  //console.log(status.x);
   ctx.lineTo(currentstatus.x,currentstatus.y);
-  console.log(currentstatus.x);
+  //console.log(currentstatus.x);
   ctx.stroke();
 
 }

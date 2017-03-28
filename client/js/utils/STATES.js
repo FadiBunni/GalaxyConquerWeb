@@ -259,7 +259,6 @@ var playing = {
 
   loop: function(){
     clearBackground(params[4],params[7]);
-    //params[6].emit('spawnShips');
     if(playing.mouseevent1.drag){
       playing.mouseevent1.draw();
     }
@@ -282,8 +281,11 @@ var playing = {
       for(var objectPlanet in serverPlanets){
         var objP = serverPlanets[objectPlanet];
         if(planetMouseIntersect(objP,playing.mouseevent1)){
-          console.log(currentPlanets)
           Drawobjects.drawEndPlanetBorder(params[4],currentPlanets,objP,params[6]);
+          var setShipsCoordinates = [currentPlanets,objP];
+          console.log(setShipsCoordinates);
+
+          params[6].emit("setShipsCoordinates", setShipsCoordinates);
             //if(clicked on planet send ship!)
         }
       }

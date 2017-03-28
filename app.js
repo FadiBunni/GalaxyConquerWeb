@@ -51,8 +51,8 @@ io.on('connection', function(socket){
         if(roomIndex) roomManager.rooms[roomIndex].planets[socket.id].ready = true;
     });
 
-    // socket.on('spawnShips', function(){
-    //     console.log('heey');
-    // });
+    socket.on('setShipsCoordinates', function(setShipsCoordinates){
+        console.log(setShipsCoordinates);
+    });
 });
 
