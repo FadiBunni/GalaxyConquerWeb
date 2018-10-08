@@ -2,7 +2,6 @@ const Baseobject = require("../utils/baseobject.js");
 
 function Ships(id,playerid,color,startPlanet,endPlanet){
 	Baseobject.call(this);
-	var self = this;
 	var xPos,yPos,xEnd,yEnd,direction,speed,angle;
 	speed = 4;
 	direction = 1;
@@ -15,6 +14,8 @@ function Ships(id,playerid,color,startPlanet,endPlanet){
 	this.amoutOfAttack = 1;
 	startPlanet.status.planet.planetScoreNumber--;
 
+
+	//NOTE - Selfspawning ships
 	this.spawnShipsAroundPlayerPlanets = (function(){
 		const p = startPlanet;
 		const m = Math.random();
@@ -29,6 +30,7 @@ function Ships(id,playerid,color,startPlanet,endPlanet){
 	})();
 
 	this.role = "ship";
+	
 	this.status.ship = {
 		id:id,
 		role:this.role,

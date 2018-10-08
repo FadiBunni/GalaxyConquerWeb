@@ -31,6 +31,7 @@ io.on('connection', function(socket){
     //Push socket to lobby and delete them form lobby when they are ready
     socket.on('waiting', function(){
         console.log('waiting from ' + socket.id);
+        console.log("hello")
         //add the sockets to an array.
         lobbyManager.push(socket);
         //Create a new room for the two sockets, and delte them from the array.

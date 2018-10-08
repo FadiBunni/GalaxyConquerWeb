@@ -17,6 +17,7 @@ function RoomManager(io){
 		//Add the players to the new room
 		player0.join(roomId);
 		player1.join(roomId);
+		console.log(typeof player0)
 		//Add to array and set them equal to room and roomId
 		RmMg.rooms[roomId] = room;
 		RmMg.roomIndex[player0.id] = roomId;

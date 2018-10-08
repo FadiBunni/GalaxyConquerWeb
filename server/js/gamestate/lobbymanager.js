@@ -2,8 +2,9 @@ function LobbyManager(io){
 	var LbMg = this;
 	LbMg.lobby = [];
 	LbMg.updating = false;
+	LbMg.dispatching = false;
 
-	//Push the connected socket to the array
+	//Push the connected socket/player to the array
 	LbMg.push = function(socket){
 		//if the element does not exist in the array add one.
 		if(LbMg.lobby.indexOf(socket) < 0){
@@ -22,7 +23,6 @@ function LobbyManager(io){
 
 	//When 2 or more players is in the lobby, create a room for 2 players to play in
 	LbMg.dispatch = function(RmMg){
-		//first time loading the method, dispatching is undefinded!!
 		if(LbMg.dispatching) return;
 		LbMg.dispatching = true;
 
